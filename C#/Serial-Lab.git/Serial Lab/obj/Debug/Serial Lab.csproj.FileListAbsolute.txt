@@ -1,0 +1,10 @@
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\obj\Debug\Seriallab.AboutBox1.resources
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\obj\Debug\Seriallab.MainForm.resources
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\obj\Debug\Seriallab.Properties.Resources.resources
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\obj\Debug\Serial Lab.csproj.GenerateResource.cache
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\bin\Debug\Serial Lab.exe.config
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\bin\Debug\Serial Lab.exe
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\bin\Debug\Serial Lab.pdb
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\obj\Debug\Serial Lab.csproj.CoreCompileInputs.cache
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\obj\Debug\Serial Lab.exe
+D:\Projektek\JCB_SolderingStation\C#\Serial-Lab.git\Serial Lab\obj\Debug\Serial Lab.pdb
