@@ -35,6 +35,4 @@ void MainTask(void);
 void MainInit(void);
 void StateMachine(void);
 extern void StateMachine(void);
-void PID_Discrete(void);
-void PID_Continous(void);
 #endif /* APPLICATION_H_ */

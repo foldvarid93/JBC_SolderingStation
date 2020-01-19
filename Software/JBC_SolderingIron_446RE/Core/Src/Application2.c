@@ -34,7 +34,7 @@ bool OutputState = false;
 uint8_t OutputDuty = 10;
 uint8_t OutputDutyFiltered = 0;
 float Ts = 0.11;
-uint8_t N = 5;
+uint8_t N = 15;
 float Kp = 0;
 float Ki = 0;
 float Kd = 0;
@@ -56,23 +56,19 @@ float B0;
 float B1;
 float B2;
 //
-float Derivative=0;
-float Integral=0;
-float Bias=0;
-//
 //const uint16_t EncoderOffset = 0x7FFF;
 //state machine variables
 bool SolderingIronIsInHolder;//1 if soldering iron is in the Holder
-bool SolderingTipIsRemoved=false;//new PCB version can distinguish removed tip and unconnected soldering iron
-#ifdef LCDTFT
 bool SolderingIronNotConnected;//1 if soldering iron unconnected
+#ifdef LCDTFT
+bool SolderingTipIsRemoved=false;//new PCB version can distinguish removed tip and unconnected soldering iron
 extern WM_HWIN hDialog;//
 extern WM_HWIN hText_0;//Set Temperature
 extern WM_HWIN hText_1;//setpoint
-extern WM_HWIN hText_2;//ï¿½C
+extern WM_HWIN hText_2;//°C
 extern WM_HWIN hText_3;//Soldering Iron Temperature
 extern WM_HWIN hText_4;//actual temp
-extern WM_HWIN hText_5;//ï¿½C
+extern WM_HWIN hText_5;//°C
 extern WM_HWIN hText_6;//Heating power
 extern WM_HWIN hProgbar_0;//progress bar
 #endif
@@ -170,58 +166,6 @@ void SendMeasurements(void) {
 	//send
 	HAL_UART_Transmit(&huart2, (uint8_t*) UartTxData, strlen(UartTxData), 100);
 }
-//PID_discrete
-void PID_Continous(void){
-	E1 = E0;
-	E0 = SetPoint - T_tc;
-	Integral = Integral + (E0 * 0.11);
-	if(Integral<-100){
-		Integral=-100;
-	}
-	if(Integral>100){
-		Integral=100;
-	}
-	Derivative = (E0 - E1) / 0.11;
-	U0 = Kp*E0 + Ki*Integral + Kd*Derivative + Bias;
-	if (U0 > 100) {
-		U0 = 100;
-	}
-	if (U0 < 0) {
-		U0 = 0;
-	}
-	OutputDuty = (((int16_t) U0) / 10) * 10;
-	OutputDutyFiltered=(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100;
-}
-//
-void PID_Discrete(void){
-	b0 = (Kp * (1 + N * Ts)) + (Ki * Ts * (1 + N * Ts))	+ (Kd * N);
-	b1 = -((Kp * (2 + N * Ts)) + (Ki * Ts) + (2 * Kd * N));
-	b2 = Kp + (Kd * N);
-	a0 = 1 + N * Ts;
-	a1 = -(2 + N * Ts);
-	a2 = 1;
-	A1 = a1 / a0;
-	A2 = a2 / a0;
-	B0 = b0 / a0;
-	B1 = b1 / a0;
-	B2 = b2 / a0;
-	//
-	E2 = E1;
-	E1 = E0;
-	E0 = SetPoint - T_tc;
-	U2 = U1;
-	U1 = U0;
-	U0 = -(A1 * U1) - (A2 * U2) + (B0 * E0) + (B1 * E1)	+ (B2 * E2);
-	//
-	if (U0 > 100) {
-		U0 = 100;
-	}
-	if (U0 < 0) {
-		U0 = 0;
-	}
-	OutputDuty = (((int16_t) U0) / 10) * 10;//rounding output duty up or down to tens 0,10,...,90,100
-	OutputDutyFiltered=(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100;
-}
 //external interrupt
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == INT_ZC_Pin) {
@@ -250,16 +194,43 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 					//convert to celsius
 					U_measured = ADCData * VoltageMultiplier; // measured TC voltage in microvolts = Uadc(LSB) *3.662;
 					T_tc = (U_measured / U_seebeck) + T_amb; //Termocoulpe temperature=Measured voltage/seebeck voltage+Ambient temperature (cold junction compensation)
+					//T_tc=(uint16_t)T_tc;
 					MovingAverage_T_tc = ((uint16_t)T_tc * TemperatureMovingAverageCoeff1 + MovingAverage_T_tc * TemperatureMovingAverageCoeff2)/ 100;//exponential filter with 2 sample and lambda=0.8
 					MovingAverage_T_tc = ((MovingAverage_T_tc + 4) / 5) * 5;//rounding to 0 or 5 //MovingAverage_T_tc=T_tc;
 				}
 #ifdef	PID_CTRL
 				//PID begin
 				if (OutputState == true) {
-					//PID_Discrete();
-					PID_Continous();
-				}
-				else {
+					b0 = (Kp * (1 + N * Ts)) + (Ki * Ts * (1 + N * Ts))	+ (Kd * N);
+					b1 = -((Kp * (2 + N * Ts)) + (Ki * Ts) + (2 * Kd * N));
+					b2 = Kp + (Kd * N);
+					a0 = 1 + N * Ts;
+					a1 = -(2 + N * Ts);
+					a2 = 1;
+					A1 = a1 / a0;
+					A2 = a2 / a0;
+					B0 = b0 / a0;
+					B1 = b1 / a0;
+					B2 = b2 / a0;
+					E2 = E1;
+					E1 = E0;
+					U2 = U1;
+					U1 = U0;
+					E0 = SetPoint - T_tc;//MovingAverage_T_tc;			//Actual error
+					U0 = -(A1 * U1) - (A2 * U2) + (B0 * E0) + (B1 * E1)	+ (B2 * E2);
+					if (E0 < 0) {
+						E0 = 0;
+						//U0 = 0;
+					}
+					if (U0 > 100) {
+						U0 = 100;
+					}
+					if (U0 < 0) {
+						U0 = 0;
+					}
+					OutputDuty = (((int16_t) U0 + 5) / 10) * 10;//rounding output duty up or down to tens 0,10,...,90,100
+					OutputDutyFiltered=(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100;
+				} else {
 					OutputDuty = 0;
 				}
 				//PID end
@@ -517,6 +488,10 @@ void user_pwm_setvalue(uint16_t value) {
 #endif
 //
 void StateMachine(void){
+	//local varaibles
+	char TmpStr[5];
+	uint16_t EncoderReadValue;
+	//
 	if(HAL_GPIO_ReadPin(SLEEP_GPIO_Port,SLEEP_Pin)==1){
 		SolderingIronIsInHolder=true;//Soldering iron is in the holder
 	}
@@ -524,10 +499,6 @@ void StateMachine(void){
 		SolderingIronIsInHolder=false;//Soldering iron is not in the holder
 	}
 #ifdef LCDTFT
-	//locals
-	char TmpStr[5];
-	uint16_t EncoderReadValue;
-	//
 	if(HAL_GPIO_ReadPin(SNC_GPIO_Port,SNC_Pin)==1){//soldering iron is connected
 		SolderingIronNotConnected=false;
 	}
@@ -714,7 +685,7 @@ void MainInit(void) {
 		TIM2->CNT = (uint8_t) tmp + EncoderOffset;
 	}
 	else{
-		TIM2->CNT = 10 + EncoderOffset;//safety default 100ï¿½C
+		TIM2->CNT = 10 + EncoderOffset;//safety default 100°C
 	}
 	if ((EE_ReadVariable(0x0002, &tmp)) == HAL_OK) {//kp
 		Kp=tmp;
@@ -742,8 +713,6 @@ void MainInit(void) {
 	//
 	HAL_UART_Receive_IT(&huart2, (uint8_t*)UartRxData, 39);
 	SetPointBackup=(TIM2->CNT-0x7FFF)*10;
-	//
-	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);//enable zero crossing interrupt
 }
 //
 void MainTask(void) {

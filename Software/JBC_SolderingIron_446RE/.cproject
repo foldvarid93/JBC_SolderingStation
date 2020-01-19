@@ -129,7 +129,6 @@
 						</tool>
 					</fileInfo>
 					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.106316" name="Application.h" rcbsApplicability="disable" resourcePath="Core/Inc/Application2.h" toolsToInvoke=""/>
-					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.1097282905" name="Application.h" rcbsApplicability="disable" resourcePath="Core/Inc/Application.h" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry excluding="Inc/Application2.h|Src/Application2.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
