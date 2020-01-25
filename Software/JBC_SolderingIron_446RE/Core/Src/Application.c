@@ -615,9 +615,9 @@ void StateMachine(void){
 	if (TIM2->CNT > 0x802C) {
 		TIM2->CNT = 0x802C;
 	}
-	SetPoint = (TIM2->CNT - EncoderOffset) * 10;
+	SetPointBackup = (TIM2->CNT - EncoderOffset) * 10;
 	//setpoint
-	uint16_t temp = SetPoint;
+	uint16_t temp = SetPointBackup;
 	uint8_t i = 0;
 	TmpBuf[i] = (temp / 100) + 0x30;		//százas
 	if (TmpBuf[i] != '0') {
@@ -682,7 +682,7 @@ void StateMachine(void){
 		FlashWriteEnabled=true;
 		LCD_write(0x94, 0x00);
 		LCD_text("                    ");
-		//SetPoint = SetPointBackup;
+		SetPoint = SetPointBackup;
 	}
 	if (OutputState) {
 		LCD_write(0xD4, 0x00);
