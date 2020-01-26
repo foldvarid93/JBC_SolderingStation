@@ -119,6 +119,11 @@ I ordered my boards with 6 days shipping. The total cost is around 25$, but it c
 ![IMG_2303](https://user-images.githubusercontent.com/41072101/73133545-68d7d200-402a-11ea-8ddb-eb43cb129a42.JPG)
 
 I ordered all of components from RS Components (some components from other local stores near my home). The component BOM can be found here.
+### 2.11 Final PCB assembly 
+
+![IMG_0224](https://user-images.githubusercontent.com/41072101/73133752-72af0480-402d-11ea-94ba-533ad89b242f.JPG)
+![IMG_0222](https://user-images.githubusercontent.com/41072101/73133753-72af0480-402d-11ea-8fea-0b1f20697ce8.JPG)
+![IMG_0223](https://user-images.githubusercontent.com/41072101/73133754-73479b00-402d-11ea-94b9-662fef70e5ec.JPG)
 
 ## 4.Software
 
