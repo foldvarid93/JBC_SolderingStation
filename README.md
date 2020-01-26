@@ -98,24 +98,12 @@ My choice was the [Texas Instruments OPA335](https://www.ti.com/lit/ds/symlink/o
 
 ### 2.7 Optical isolations
 
-### 2.6 The complete schematic drawing
+### 2.8 The complete schematic drawing
 To sum it up, here is the whole schematic drawing according to above mentioned points. 
 You can see that I used a precision amplifier instead of a thermocouple interface IC. 
 ![2020-01-26_10h13_12](https://user-images.githubusercontent.com/41072101/73133107-8ace5600-4024-11ea-8c63-d67544de25a5.png)
 
-## 3.Software
-
-### 3.1.Hello world, the prototype software
-
-### 3.2.Matlab, identification and designing a PID
-
-### 3.3 User Interface
-
-![IMG_1645](https://user-images.githubusercontent.com/41072101/64068853-74bb9580-cc3e-11e9-9b0a-3bea928fe507.JPG)
-
-### 3.4 Final software, GUI, PID, and everything, this is why it called final. :) 
-
-## 4.PCB design
+### 2.9.PCB design
 Individual PCB was designed in Altium Designer software. The size of the board is 100x55mm. I always design with 3D components, because later I design a housing for my devices, it can be a big help if I have a precise 3D model of my PCBs. 
 
 ![2019-11-19_20h41_34](https://user-images.githubusercontent.com/41072101/69180168-22876380-0b0d-11ea-893a-51111d1dae46.png)
@@ -123,14 +111,26 @@ Individual PCB was designed in Altium Designer software. The size of the board i
 ![2019-11-19_20h42_02](https://user-images.githubusercontent.com/41072101/69180171-231ffa00-0b0d-11ea-8d08-4d8cdb8b5fda.png)
 ![2019-11-19_20h42_17](https://user-images.githubusercontent.com/41072101/69180172-231ffa00-0b0d-11ea-9ee3-e3be4d7f2462.png)
 
-## 4.Prototype PCB
+### 2.10 Prototype PCB
 My ptototype PCB's were made by [JLCPCB](https://jlcpcb.com) in China. I am not recommend to make PCB at home (toxic acids, vapours that can harmful for you), okay, to deliver 5 PCB with airplane not so environmentally friendly too... I left the choice for everyone. :)
 I ordered my boards with 6 days shipping. The total cost is around 25$, but it can be less if you can wait 15-20 working days for the delivery.
 
 ![IMG_2302](https://user-images.githubusercontent.com/41072101/73133544-683f3b80-402a-11ea-9fcb-9eb59c408e8d.JPG)
 ![IMG_2303](https://user-images.githubusercontent.com/41072101/73133545-68d7d200-402a-11ea-8ddb-eb43cb129a42.JPG)
 
-I ordered all of components from RS Components (some components from other local stores near my home). The component BOM can be found here. 
+I ordered all of components from RS Components (some components from other local stores near my home). The component BOM can be found here.
+
+## 4.Software
+
+### 4.1.Hello world, the prototype software
+
+### 4.2.Matlab, identification and designing a PID
+
+### 4.3 User Interface
+
+![IMG_1645](https://user-images.githubusercontent.com/41072101/64068853-74bb9580-cc3e-11e9-9b0a-3bea928fe507.JPG)
+
+### 4.4 Final software, GUI, PID, and everything, this is why it called final. :)
 
 ## 5.Housing design, 3D printing
 
