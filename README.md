@@ -116,11 +116,21 @@ You can see that I used a precision amplifier instead of a thermocouple interfac
 ### 3.4 Final software, GUI, PID, and everything, this is why it called final. :) 
 
 ## 4.PCB design
-Individual PCB was designed in Altium Designer software. The size of the board is 100x55mm. It will be manufactured at JLCPCB factory in China. 
+Individual PCB was designed in Altium Designer software. The size of the board is 100x55mm. I always design with 3D components, because later I design a housing for my devices, it can be a big help if I have a precise 3D model of my PCBs. 
+
 ![2019-11-19_20h41_34](https://user-images.githubusercontent.com/41072101/69180168-22876380-0b0d-11ea-893a-51111d1dae46.png)
 ![2019-11-19_20h41_43](https://user-images.githubusercontent.com/41072101/69180170-22876380-0b0d-11ea-9e77-9504e61e7dab.png)
 ![2019-11-19_20h42_02](https://user-images.githubusercontent.com/41072101/69180171-231ffa00-0b0d-11ea-8d08-4d8cdb8b5fda.png)
 ![2019-11-19_20h42_17](https://user-images.githubusercontent.com/41072101/69180172-231ffa00-0b0d-11ea-9ee3-e3be4d7f2462.png)
+
+## 4.Prototype PCB
+My ptototype PCB's were made by [JLCPCB](https://jlcpcb.com) in China. I am not recommend to make PCB at home (toxic acids, vapours that can harmful for you), okay, to deliver 5 PCB with airplane not so environmentally friendly too... I left the choice for everyone. :)
+I ordered my boards with 6 days shipping. The total cost is around 25$, but it can be less if you can wait 15-20 working days for the delivery.
+
+![IMG_2302](https://user-images.githubusercontent.com/41072101/73133544-683f3b80-402a-11ea-9fcb-9eb59c408e8d.JPG)
+![IMG_2303](https://user-images.githubusercontent.com/41072101/73133545-68d7d200-402a-11ea-8ddb-eb43cb129a42.JPG)
+
+I ordered all of components from RS Components (some components from other local stores near my home). The component BOM can be found here. 
 
 ## 5.Housing design, 3D printing
 
