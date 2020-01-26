@@ -94,7 +94,7 @@ There is 2 important requirements with the opamp
 -Singe rail capability (we only have 3.3V MCU supply)
 -Rail to rail output (output linearity near the positive and negative supply potential)
 
-My choice was the Texas Instruments [OPA335](https://www.ti.com/lit/ds/symlink/opa335.pdf).  
+My choice was the [Texas Instruments OPA335](https://www.ti.com/lit/ds/symlink/opa335.pdf).  
 
 ### 2.7 Optical isolations
 
