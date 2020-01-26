@@ -80,11 +80,26 @@ The switching circuit for the heating element contains an optotriac to isolate t
 
 ![5](https://user-images.githubusercontent.com/41072101/65082635-b8383280-d9a6-11e9-8926-9a84499579d3.png)
 
-At this point there was an uncertain part of the whole project. Except the manufacturer maybe noone knows the exact type of the thermocouple in the cartridge. On the market there are available thermocouple interface IC-s from Maxim Integrated. I ordered [MAX31855](https://datasheets.maximintegrated.com/en/ds/MAX31855.pdf) IC N and K type to try out both. First of all I tried the N type. There is an additional thing about this. You can not use grounded thermocouple, so you need to find a solution because the outer sleeve of the C245 cartridge is grounded (might be grounded in a good soldering iron). So I needed to isolate the 5V (and 3,3V) power supply of the MCU from the ground and from the heater circuits.
+At this point there was an uncertain part of the whole project. Except the manufacturer maybe noone knows the exact type of the thermocouple in the cartridge. On the market there are available thermocouple interface IC-s from Maxim Integrated. I ordered [MAX31855](https://datasheets.maximintegrated.com/en/ds/MAX31855.pdf) IC N and K type to try out both. First of all I tried the N type. There is an additional thing about this. You can not use grounded thermocouple, so you need to find a solution because the outer sleeve of the C245 cartridge is grounded (might be grounded in a good soldering iron). So I needed to isolate the 5V (and 3,3V) power supply of the MCU from the ground and from the heater circuits. 
+Update: This is not a proper solution to reading temperature values. The main problem is the timing. This interface IC can communicate with the MCU over SPI but the measurements cannot be performed at that point. In the background the IC refresh its registers with the actual (Okay, what is the actual? When? And where? At the top of the sinewave? Yes maybe there, maybe at the middle of the sine, so it is not deterministic...)
+![image](https://user-images.githubusercontent.com/41072101/73133221-e51be680-4025-11ea-9432-029fad706f45.png)
+It can be seen, the Temperature conversion time has a massive jitter. 70 to 100ms (5 period of the line sine wave(50Hz)). In this range a specific IC can be anywhere, so we can't hold the precise timings. 
+### 2.6 Thermocouple interface with a precision opamp
+What is the precison opamp? And what precison we need to perform here? In this case we have N x 10uV voltage on the thermocouple sensor. At 500°C temperature the sensor gives 10-20mV signal. We have 12bit, 3.3V ADC in the STM32. This means 4096 unit in 3.3V range. One unit is 3.3V/4096=0,0008056640625 => 0.8056640625mV =>805.6640625uV. We have 26uV Siebeck-coefficient, so the error would be 805.6640625uV/26uV/°C=31°C. This is why we need to condition the thermocouple's signal. 
+There is 2 important requirements with the opamp
+-The noise on the output need to be as small as possible
+-The offset voltage and current need to be as small as possible (~0)
+-Singe rail capability (we only have 3.3V MCU supply)
+-Rail to rail output (output linearity near the positive and negative supply potential)
 
-### 2.5 Optical isolations
+My choice was the Texas Instruments [OPA335](https://www.ti.com/lit/ds/symlink/opa335.pdf).  
+
+### 2.7 Optical isolations
 
 ### 2.6 The complete schematic drawing
+To sum it up, here is the whole schematic drawing according to above mentioned points. 
+You can see that I used a precision amplifier instead of a thermocouple interface IC. 
+![2020-01-26_10h13_12](https://user-images.githubusercontent.com/41072101/73133107-8ace5600-4024-11ea-8c63-d67544de25a5.png)
 
 ## 3.Software
 
