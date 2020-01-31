@@ -33,7 +33,7 @@ Here is some already existing projects.
 So, to sum up the above mentioned point there is no universal solution. Okay, Unisolder would be the best choice, but I only want a JBC 470 compatible contoller. I can't flash PICs, and the schematic is overcomplicated.(Nevertheless, I know that is an UNIversal SOLution for any types of solDERing irons...)
 So I have decided that I will create my own project. The main goal was to create a good and cheap alternative, and during the prototyping I would have to learnt (PID, programming, signal processing, a little power electronics, Matlab, etc).   
 
-## 1.First steps
+## 1 First steps
 
 ### 1.1 The JBC cartridges 
 
@@ -54,9 +54,9 @@ When you are skeptic about the right consequences you can repeat the measurement
 
 ### 1.2 Ideas -> Paper sketches
 
-## 2.Designing HW prototype.
+## 2 Designing HW prototype.
 
-### 2.1. The used components and the experimental schematic
+### 2.1 The used components and the experimental schematic
 
 ![2](https://user-images.githubusercontent.com/41072101/65081428-eb2cf700-d9a3-11e9-91fd-5e8b2c111bff.JPG)
 
@@ -119,7 +119,7 @@ To sum it up, here is the whole schematic drawing according to above mentioned p
 You can see that I used a precision amplifier instead of a thermocouple interface IC. 
 ![2020-01-26_10h13_12](https://user-images.githubusercontent.com/41072101/73133107-8ace5600-4024-11ea-8c63-d67544de25a5.png)
 
-### 2.9.PCB design
+### 2.9 PCB design
 Individual PCB was designed in Altium Designer software. The size of the board is 100x55mm. I always design with 3D components, because later I design a housing for my devices, it can be a big help if I have a precise 3D model of my PCBs. 
 
 ![2019-11-19_20h41_34](https://user-images.githubusercontent.com/41072101/69180168-22876380-0b0d-11ea-893a-51111d1dae46.png)
@@ -141,11 +141,11 @@ I ordered all of components from RS Components (some components from other local
 ![IMG_0222](https://user-images.githubusercontent.com/41072101/73133753-72af0480-402d-11ea-8fea-0b1f20697ce8.JPG)
 ![IMG_0223](https://user-images.githubusercontent.com/41072101/73133754-73479b00-402d-11ea-94b9-662fef70e5ec.JPG)
 
-## 4.Software
+## 4 Software
 
-### 4.1.Software overview
+### 4.1 Software overview
 
-### 4.2.PID control loop
+### 4.2 PID control loop
 
 ### 4.3 User Interface
 
@@ -159,15 +159,15 @@ I used the free STemWin GUI library to give a simple graphic user interface for 
 
 ### 4.5 Tests and validations 
 
-## 5.Housing design, 3D printing
+## 5 Housing design, 3D printing
 
-## 6.Build up
+## 6 Build up
 
-## 7.Tests, conclusions
+## 7 Tests, conclusions
 
-## 8.Additinal informations
+## 8 Additinal informations
 
-## 9.Some picture about the station
+## 9 Some picture about the station
 
 ![IMG_1646](https://user-images.githubusercontent.com/41072101/64068854-75542c00-cc3e-11e9-8e9e-f17c2271b396.JPG)
 ![IMG_1636](https://user-images.githubusercontent.com/41072101/64068855-7a18e000-cc3e-11e9-8ed5-411b4704acae.JPG)
