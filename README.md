@@ -74,21 +74,28 @@ We work in 11 half waves cycles. One of them is for reading out the TC temperatu
 
 ### 2.3 The power stage
 
+In the original solution there are 2 serially connected MOSFET. To save money I designed my DIY station with triac. It can be used in both half period of the sinusoidal curve.    
+
 ![6](https://user-images.githubusercontent.com/41072101/65175396-1ae70800-da53-11e9-9e33-f825b67ad4df.png)
 
 The switching circuit for the heating element contains an optotriac to isolate the AC power from the MCU power supply. My transformer can produce 9A current with 24V voltage and a C245 type cartridge can consumpt 130-150W during the heating up sequence. I used a typical circuit for the AC part. Fortunately there is no demand for a more complex solution. I chosed a MOC3041 optotriac with internal zero-cross detector. My plan was that I use my individual "zero-cross detector" to generate external interrupts for the MCU at every 10ms. I use the rising and falling edges to find out where the sine wave is at a certain point. Before the zero crossing, the interrupt can switch off the optotriac's LED and at the next halfwave triac will remain in off-state. In that case when thermocouple need to be read but first of all the software must wait some 100us or 1ms after the zero point to be sure the switching transients had eliminated.         
 
-### 2.4 Thermocouple interface circuit
+### 2.4 Thermocouple interface circuit (EXPERIMENTAL)
+
+To get some experience with an interface IC, I tried the MAX31855 thermocouple IC.  
 
 ![5](https://user-images.githubusercontent.com/41072101/65082635-b8383280-d9a6-11e9-8926-9a84499579d3.png)
 
-At this point there was an uncertain part of the whole project. Except the manufacturer maybe noone knows the exact type of the thermocouple in the cartridge. On the market there are available thermocouple interface IC-s from Maxim Integrated. I ordered [MAX31855](https://datasheets.maximintegrated.com/en/ds/MAX31855.pdf) IC N and K type to try out both. First of all I tried the N type. There is an additional thing about this. You can not use grounded thermocouple, so you need to find a solution because the outer sleeve of the C245 cartridge is grounded (might be grounded in a good soldering iron). So I needed to isolate the 5V (and 3,3V) power supply of the MCU from the ground and from the heater circuits. 
-Update: This is not a proper solution to reading temperature values. The main problem is the timing. This interface IC can communicate with the MCU over SPI but the measurements cannot be performed at that point. In the background the IC refresh its registers with the actual (Okay, what is the actual? When? And where? At the top of the sinewave? Yes maybe there, maybe at the middle of the sine, so it is not deterministic...)
+At this point there was an uncertain part of the whole project. Except the manufacturer maybe noone knows the exact type of the thermocouple in the cartridge. On the market there are available thermocouple interface IC-s from Maxim Integrated. I ordered [MAX31855](https://datasheets.maximintegrated.com/en/ds/MAX31855.pdf) IC N and K type to try out both. First of all I tried the N type. There is an additional thing about this. You can not use grounded thermocouple, so you need to find a solution because the outer sleeve of the C245 cartridge is ESD grounded via 1MOhm resistor (the tip might be ESD safe in a good soldering iron). So I needed to isolate the 5V (and 3,3V) power supply of the MCU from the ground and from the heater circuits.
+
+The result of the experiment: This is not a proper solution to reading temperature values. The main problem is the timing. This interface IC can communicate with the MCU over SPI but the measurements cannot be performed at that point. In the background the IC refresh its registers with the actual (Okay, what is the actual? When? And where? At the top of the sinewave? Yes maybe there, maybe at the middle of the sine, so it is not deterministic...)
 
 ![image](https://user-images.githubusercontent.com/41072101/73133221-e51be680-4025-11ea-9432-029fad706f45.png)
 
-It can be seen, the Temperature conversion time has a massive jitter. 70 to 100ms (5 period of the line sine wave(50Hz)). In this range a specific IC can be anywhere, so we can't hold the precise timings. 
-### 2.6 Thermocouple interface with a precision opamp
+It can be seen, the Temperature conversion time has a massive jitter. 70 to 100ms (5 period of the line sine wave(50Hz)). In this range a specific IC can be anywhere, so we can't hold the precise timings.
+
+### 2.6 Thermocouple interface with a precision opamp (The final solution)
+
 What is the precison opamp? And what precison we need to perform here? In this case we have N x 10uV voltage on the thermocouple sensor. At 500°C temperature the sensor gives 10-20mV signal. We have 12bit, 3.3V ADC in the STM32. This means 4096 unit in 3.3V range. One unit is 3.3V/4096=0,0008056640625 => 0.8056640625mV =>805.6640625uV. We have 26uV Siebeck-coefficient, so the error would be 805.6640625uV/26uV/°C=31°C. This is why we need to condition the thermocouple's signal. 
 There is 2 important requirements with the opamp
 -The noise on the output need to be as small as possible
