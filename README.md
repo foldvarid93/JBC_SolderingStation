@@ -43,7 +43,9 @@ There was a person who mentioned on some electronics forum that the green is the
 
 [I found an article on the web about these JBC cartridges.](https://patents.google.com/patent/EP1086772A2/en) According to that document the heating element is between red(common, heater1 and TC+)[2] and blue(heater2)[5] and the thermocouple is between red(heater1 and TC+)[2] and green(TC-)[1]. *[Connector pin number on the soldering iron] To make this statement absolutely true, I have performed some basic measurements on the tip. 
 1. The heater is around 2-3Ohm sightly depending on the ambient temperature. For me that was ~2,5Ohm.
-2. According to the sketch above, I heated up the tip with an external heat source (cigarette lighter, another soldering iron). When the tip is around 2-300°C the thermocouple generates 4-6mV. Measuring DC voltage between red and green with a multimeter, you need to see something like that values. 
+2. According to the sketch above, I heated up the tip with an external heat source (cigarette lighter, another soldering iron). When the tip is around 2-300°C the thermocouple generates 4-6mV. Measuring DC voltage between red and green with a multimeter, you need to see something like that values.
+
+![image](https://user-images.githubusercontent.com/41072101/73572543-58cc5200-4471-11ea-97a1-d64d471245e8.png)
 
 When you measure at 2-300°C between blue and green (heater2 and TC-) you can measure the series resistance of the TC and heater coil. When you put the positive cable on the blue and the negative on the green you need to measure higher(?) value compared with the reversed measurement (positive on the green and negative on the blue). If the difference is recognizable and we can be sure about that is not a measuring error, we can state that the first supposition is the reality.
 When you are skeptic about the right consequences you can repeat the measurements with the second theorem (I did)...
