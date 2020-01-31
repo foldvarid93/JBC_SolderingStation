@@ -149,13 +149,15 @@ I ordered all of components from RS Components (some components from other local
 
 ### 4.3 User Interface
 
+I used the free STemWin GUI library to give a simple graphic user interface for this project. As in my other projects also in this was used an inexpensive 240x320 pixel LCD module from ebay. To avoid problems I used my own low level driver for this Arduino typed LCD module.
+
 ![IMG_1645](https://user-images.githubusercontent.com/41072101/64068853-74bb9580-cc3e-11e9-9b0a-3bea928fe507.JPG)
 
 ### 4.4 Final software
 
 [The software can be found here.](https://github.com/foldvarid93/JBC_SolderingStation/tree/master/Software)
 
-### 4.4 Final software
+### 4.5 Tests and validations 
 
 ## 5.Housing design, 3D printing
 
