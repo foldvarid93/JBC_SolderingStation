@@ -33,7 +33,9 @@ Here is some already existing projects.
 So, to sum up the above mentioned point there is no universal solution. Okay, Unisolder would be the best choice, but I only want a JBC 470 compatible contoller. I can't flash PICs, and the schematic is overcomplicated.(Nevertheless, I know that is an UNIversal SOLution for any types of solDERing irons...)
 So I have decided that I will create my own project. The main goal was to create a good and cheap alternative, and during the prototyping I would have to learnt (PID, programming, signal processing, a little power electronics, Matlab, etc).   
 
-## 1.First steps. What we need to do?
+## 1.First steps
+
+### 1.1 The JBC cartridges 
 
 Firstly I wanted to build a proper working proto HW. On the net, there are a lots of true and false informations about the cartridge. There are 2 type of people: The first typed are saying the common conductor is the red wire, and the second says green. Okay but what is the truth?
 
@@ -49,6 +51,8 @@ There was a person who mentioned on some electronics forum that the green is the
 
 When you measure at 2-300°C between blue and green (heater2 and TC-) you can measure the series resistance of the TC and heater coil. When you put the positive cable on the blue and the negative on the green you need to measure higher(?) value compared with the reversed measurement (positive on the green and negative on the blue). If the difference is recognizable and we can be sure about that is not a measuring error, we can state that the first supposition is the reality.
 When you are skeptic about the right consequences you can repeat the measurements with the second theorem (I did)...
+
+### 1.2 Ideas -> Paper sketches
 
 ## 2.Designing HW prototype.
 
