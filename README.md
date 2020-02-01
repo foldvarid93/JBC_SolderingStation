@@ -12,23 +12,15 @@ Here is some already existing projects.
 
 ## There are some basic problems with those solution:
 
--I don't have an arduino and I don't want to use that. 
-
--I wanted to use PID control to provide stable temperature at the end of the tip. 
-
--I wanted to use LCD display that I have bought a long-long time ago. 
-
--I wanted to build the HW with components that I already had.
-
--I would implemented the sleep function.
-
--3D printed housing with individual design. 
-
--Individual PCB design.
-
--I wanted an encoder as user input.
-
--I wanted to use SPI thermocouple interface IC. 
+- I don't have an arduino and I don't want to use that. 
+- I wanted to use PID control to provide stable temperature at the end of the tip. 
+- I wanted to use LCD display that I have bought a long-long time ago. 
+- I wanted to build the HW with components that I already had.
+- I would implemented the sleep function.
+- 3D printed housing with individual design. 
+- Individual PCB design.
+- I wanted an encoder as user input.
+- I wanted to use SPI thermocouple interface IC. 
 
 So, to sum up the above mentioned point there is no universal solution. Okay, Unisolder would be the best choice, but I only want a JBC 470 compatible contoller. I can't flash PICs, and the schematic is overcomplicated.(Nevertheless, I know that is an UNIversal SOLution for any types of solDERing irons...)
 So I have decided that I will create my own project. The main goal was to create a good and cheap alternative, and during the prototyping I would have to learnt (PID, programming, signal processing, a little power electronics, Matlab, etc).   
@@ -102,10 +94,10 @@ It can be seen, the Temperature conversion time has a massive jitter. 70 to 100m
 
 What is the precison opamp? And what precison we need to perform here? In this case we have N x 10uV voltage on the thermocouple sensor. At 500°C temperature the sensor gives 10-20mV signal. We have 12bit, 3.3V ADC in the STM32. This means 4096 unit in 3.3V range. One unit is 3.3V/4096=0,0008056640625 => 0.8056640625mV =>805.6640625uV. We have 26uV Siebeck-coefficient, so the error would be 805.6640625uV/26uV/°C=31°C. This is why we need to condition the thermocouple's signal. 
 There is 2 important requirements with the opamp
--The noise on the output need to be as small as possible
--The offset voltage and current need to be as small as possible (~0)
--Singe rail capability (we only have 3.3V MCU supply)
--Rail to rail output (output linearity near the positive and negative supply potential)
+- The noise on the output need to be as small as possible
+- The offset voltage and current need to be as small as possible (~0)
+- Singe rail capability (we only have 3.3V MCU supply)
+- Rail to rail output (output linearity near the positive and negative supply potential)
 
 My choice was the [Texas Instruments OPA335](https://www.ti.com/lit/ds/symlink/opa335.pdf).  
 
