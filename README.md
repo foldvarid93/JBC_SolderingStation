@@ -47,6 +47,7 @@ When you are skeptic about the right consequences you can repeat the measurement
 
 ### 2.1 The used components and the experimental schematic
 
+![IMG_1802](https://user-images.githubusercontent.com/41072101/73597342-40b90900-452b-11ea-946e-356eb594eec2.JPG)
 ![2](https://user-images.githubusercontent.com/41072101/65081428-eb2cf700-d9a3-11e9-91fd-5e8b2c111bff.JPG)
 
 I only use AVRs and STM32s, so there wasn't a question what I will use. To contolling the LCD with a proper refresh rate STM32's computing performance was requred. The proto board was built around an STM32L476-Nucleo board.
