@@ -190,6 +190,8 @@ With this refresh period the PID control loop would be (yes it was) too lazy.
 
 #### 4.2.2 "Continous" PID algorithm
 
+At least this solution was used in my project. The basic PID equations were programmed in C language. To give some saturation to the control loop's output, the manipulated signal get some limitations (0-100). Because we only have one side manipulation over the temperature (just heating, not cooling) we need to chasing the point where we don't have overshot (not so good when you set 300°C and firstly the tip heating up to 420°C and cooling down 250°C and heating up to 340°C and so on and so on) and the heating up time is short as possible (the original can heat up from room temperature to 300 within 6seconds).  
+
 [You can find the original solution here.](http://robotsforroboticists.com/pid-control)
 
 ```
