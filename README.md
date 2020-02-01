@@ -148,8 +148,73 @@ I ordered all of components from RS Components (some components from other local
 ### 4.2 PID control loop
 
 Just to give you a full overview to the PID, I will share my experiences with different methods.
-#### 4.2.1 Discrete PID 
 
+#### 4.2.1 Discrete PID algorithm
+
+The first fhing that I have tired is to implement a proper discrete PID, to controlling the plant what is the temperature control for the JBC tip. At university I had some course in controlling topic, but I forgot a lot from that times. Nevertheless I had some experience with Matlab Simulink, so my first try was that. After some problem, I searched for a solution on the web.   
+[I found a PID code and the controlling method here.](https://www.scilab.org/discrete-time-pid-controller-implementation)
+
+```
+void PID_Discrete(void){
+	b0 = (Kp * (1 + N * Ts)) + (Ki * Ts * (1 + N * Ts))	+ (Kd * N);
+	b1 = -((Kp * (2 + N * Ts)) + (Ki * Ts) + (2 * Kd * N));
+	b2 = Kp + (Kd * N);
+	a0 = 1 + N * Ts;
+	a1 = -(2 + N * Ts);
+	a2 = 1;
+	A1 = a1 / a0;
+	A2 = a2 / a0;
+	B0 = b0 / a0;
+	B1 = b1 / a0;
+	B2 = b2 / a0;
+	//
+	E2 = E1;
+	E1 = E0;
+	E0 = SetPoint - T_tc;
+	U2 = U1;
+	U1 = U0;
+	U0 = -(A1 * U1) - (A2 * U2) + (B0 * E0) + (B1 * E1)	+ (B2 * E2);
+	//
+	if (U0 > 100) {
+		U0 = 100;
+	}
+	if (U0 < 0) {
+		U0 = 0;
+	}
+	OutputDuty = (((int16_t) U0) / 10) * 10;//rounding output duty up or down to tens 0,10,...,90,100
+	OutputDutyFiltered=(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100;
+}
+```
+I have implemented the discrete method and there was massive problems with that. As I earlier said we have 11 half period from the sine curve. In the first half period (0th), tip thermocouple's temperature reading need to be performed with an ADC conversion. With 50Hz line sine frequency we have 10ms in each half period. ADC reading is performed in every 11th half period, so the sampling time is 110ms.
+With this refresh period the PID control loop would be (yes it was) too lazy. 
+
+#### 4.2.2 "Continous" PID algorithm
+
+[You can find the original solution here.](http://robotsforroboticists.com/pid-control)
+
+```
+void PID_Continous(void){
+	E1 = E0;
+	E0 = SetPoint - T_tc;
+	Integral = Integral + (E0 * 0.11);
+	if(Integral<-100){
+		Integral=-100;
+	}
+	if(Integral>100){
+		Integral=100;
+	}
+	Derivative = (E0 - E1) / 0.11;
+	U0 = Kp*E0 + Ki*Integral + Kd*Derivative + Bias;
+	if (U0 > 100) {
+		U0 = 100;
+	}
+	if (U0 < 0) {
+		U0 = 0;
+	}
+	OutputDuty = (((int16_t) U0) / 10) * 10;
+	OutputDutyFiltered=(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100;
+}
+```
 ### 4.3 User Interface
 
 I used the free STemWin GUI library to give a simple graphic user interface for this project. As in my other projects also in this was used an inexpensive 240x320 pixel LCD module from ebay. To avoid problems I used my own low level driver for this Arduino typed LCD module.
