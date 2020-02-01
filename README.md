@@ -147,6 +147,9 @@ I ordered all of components from RS Components (some components from other local
 
 ### 4.2 PID control loop
 
+Just to give you a full overview to the PID, I will share my experiences with different methods.
+#### 4.2.1 Discrete PID 
+
 ### 4.3 User Interface
 
 I used the free STemWin GUI library to give a simple graphic user interface for this project. As in my other projects also in this was used an inexpensive 240x320 pixel LCD module from ebay. To avoid problems I used my own low level driver for this Arduino typed LCD module.
