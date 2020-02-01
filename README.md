@@ -3,12 +3,9 @@
 This project was created to help people who would use a C245 and C470 JBC handle and cartridge without the expensive controller. 
 There is some project on the internet what provides a solution. My first steps was also to find a complete method or solution.
 Here is some already existing projects.
-
--Marco Reps: https://drive.google.com/file/d/0B6S_PcWWM1YlY1lORkhDcTAzdEU/view 
-
--Great Scot: https://www.instructables.com/id/DIY-Arduino-Soldering-Station/
-
--sparkybg: http://dangerousprototypes.com/forum/index.php?topic=7218.0#p61175
+- Marco Reps: https://drive.google.com/file/d/0B6S_PcWWM1YlY1lORkhDcTAzdEU/view 
+- Great Scot: https://www.instructables.com/id/DIY-Arduino-Soldering-Station/
+- sparkybg: http://dangerousprototypes.com/forum/index.php?topic=7218.0#p61175
 
 ## There are some basic problems with those solution:
 
