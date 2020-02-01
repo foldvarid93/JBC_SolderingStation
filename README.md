@@ -46,12 +46,12 @@ When you are skeptic about the right consequences you can repeat the measurement
 ## 2 Designing HW prototype.
 
 ### 2.1 The used components and the experimental schematic
+I only use AVRs and STM32s, so there wasn't a question what I will use. The proto board was built around an STM32L476-Nucleo board. At this point I just wanted to be sure about the possibilities. Will it work? Can it? It need to be find out with a possible less effort. 
+
+To contolling the LCD with a proper refresh rate STM32's computing performance was requred. The MCU is responsible for contolling the LCD, computing PID, reading TC via SPI, swithing on and off the sleep function, handling the encoder. The timing is provided by a zero crossing detector.
 
 ![IMG_1802](https://user-images.githubusercontent.com/41072101/73597342-40b90900-452b-11ea-946e-356eb594eec2.JPG)
 ![2](https://user-images.githubusercontent.com/41072101/65081428-eb2cf700-d9a3-11e9-91fd-5e8b2c111bff.JPG)
-
-I only use AVRs and STM32s, so there wasn't a question what I will use. To contolling the LCD with a proper refresh rate STM32's computing performance was requred. The proto board was built around an STM32L476-Nucleo board.
-The MCU is responsible for contolling the LCD, computing PID, reading TC via SPI, swithing on and off the sleep function, handling the encoder. The timing is provided by a zero crossing detector.    
 
 ### 2.2 Zero crossing detection
 
@@ -72,7 +72,7 @@ In the original solution there are 2 serially connected MOSFET. To save money I 
 
 ![6](https://user-images.githubusercontent.com/41072101/65175396-1ae70800-da53-11e9-9e33-f825b67ad4df.png)
 
-The switching circuit for the heating element contains an optotriac to isolate the AC power from the MCU power supply. My transformer can produce 9A current with 24V voltage and a C245 type cartridge can consumpt 130-150W during the heating up sequence. I used a typical circuit for the AC part. Fortunately there is no demand for a more complex solution. I chosed a MOC3041 optotriac with internal zero-cross detector. My plan was that I use my individual "zero-cross detector" to generate external interrupts for the MCU at every 10ms. I use the rising and falling edges to find out where the sine wave is at a certain point. Before the zero crossing, the interrupt can switch off the optotriac's LED and at the next halfwave triac will remain in off-state. In that case when thermocouple need to be read but first of all the software must wait some 100us or 1ms after the zero point to be sure the switching transients had eliminated.         
+The switching circuit for the heating element contains an optotriac to isolate the AC power from the MCU power supply. My transformer can produce 9A current with 24V voltage and a C245 type cartridge can consumpt 130-150W during the heating up sequence. I used a typical circuit for the AC part. Fortunately there is no demand for a more complex solution. I chosed a MOC3041 optotriac with internal zero-cross detector. My plan was that I use my individual "zero-cross detector" to generate external interrupts for the MCU at every 10ms. I use the rising and falling edges to find out where the sine wave is at a certain point. Before the zero crossing, the interrupt can switch off the optotriac's LED and at the next halfwave triac will remain in off-state. In that case when thermocouple need to be read but first of all the software must wait some 100us or 1ms after the zero point to be sure the switching transients had eliminated.
 
 ### 2.4 Thermocouple interface circuit (EXPERIMENTAL)
 
