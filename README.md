@@ -226,7 +226,10 @@ I used the free STemWin GUI library to give a simple graphic user interface for 
 
 [The software can be found here.](https://github.com/foldvarid93/JBC_SolderingStation/tree/master/Software)
 
-### 4.5 Tests and validations 
+### 4.5 Tests and validations
+
+![scope2](https://user-images.githubusercontent.com/41072101/74594285-c2815a00-5034-11ea-87ce-97bb2a659682.png)
+![scope4](https://user-images.githubusercontent.com/41072101/74594286-c3b28700-5034-11ea-92b7-80c9d7409a3d.png)
 
 ## 5 Housing design, 3D printing
 
