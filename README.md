@@ -240,7 +240,7 @@ I used the free STemWin GUI library to give a simple graphic user interface for 
 
 ## 8 Additinal informations
 
-## 9 Some picture about the station
+## 9 Some pictures from the station
 
 ![IMG_1646](https://user-images.githubusercontent.com/41072101/64068854-75542c00-cc3e-11e9-8e9e-f17c2271b396.JPG)
 ![IMG_1636](https://user-images.githubusercontent.com/41072101/64068855-7a18e000-cc3e-11e9-8ed5-411b4704acae.JPG)
