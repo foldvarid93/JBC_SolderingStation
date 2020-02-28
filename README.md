@@ -58,7 +58,7 @@ After the quick prototype I earned some experience with the system. In this sect
 
 ### 2.1 Microcontroller
 
-I have a lot of experience with the STM32F446RET microcontroller. In the demo software I used this type, and I think it need to be left for the project. It can be bought under 10$. 
+I have a lot of experience with the [STM32F446RET](https://www.st.com/en/microcontrollers-microprocessors/stm32f446.html) microcontroller. In the demo software I used this type, and I think it need to be left for the project. It can be bought under 10$. 
 
 ### 2.2 Zero crossing detection
 
