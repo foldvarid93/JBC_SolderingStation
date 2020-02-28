@@ -111,7 +111,7 @@ My choice was the [Texas Instruments OPA335](https://www.ti.com/lit/ds/symlink/o
 ### 2.7 Optical isolations
 
 Because this soldering station designed for a single 24V AC supply the power stage and the 5V MCU supply need to be separated from each other. Only one point can be common on. This is the GND. The triac is driven by an optotriac. Because the zero crossing detector uses a rectified 24V(eff) power supply what is around 32VDC, it need to be separated from the MCU pin which is 5V tolerant but normally 3.3V.
-The MCU supply is galvanically separated from the rectified and puffered input supply with an isolated Murata DC-DC converter.
+The MCU supply is galvanically separated from the rectified and puffered input supply with an isolated [Murata NCS3S4805SC](https://power.murata.com/datasheet?/data/power/ncl/kdc_ncs3.pdf) DC-DC converter .
 
 ### 2.8 The complete schematic drawing
 To sum it up, here is the whole schematic drawing according to above mentioned points. 
