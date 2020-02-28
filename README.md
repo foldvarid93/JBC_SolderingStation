@@ -83,7 +83,7 @@ In the original solution there are 2 serially connected MOSFET. To save money I 
 
 The switching circuit for the heating element contains an optotriac to isolate the AC power from the MCU power supply. My transformer can produce 9A current with 24V voltage and a C245 type cartridge can consumpt 130-150W during the heating up sequence. I used a typical circuit for the AC part. Fortunately there is no demand for a more complex solution. I chosed a MOC3041 optotriac with internal zero-cross detector. My plan was that I use my individual "zero-cross detector" to generate external interrupts for the MCU at every 10ms. I use the rising and falling edges to find out where the sine wave is at a certain point. Before the zero crossing, the interrupt can switch off the optotriac's LED and at the next halfwave triac will remain in off-state. In that case when thermocouple need to be read but first of all the software must wait some 100us or 1ms after the zero point to be sure the switching transients had eliminated.
 
-### 2.4 Thermocouple interface circuit (EXPERIMENTAL)
+### 2.4 Thermocouple interface circuit (experimantal)
 
 To get some experience with an interface IC, I tried the MAX31855 thermocouple IC.  
 
@@ -97,7 +97,7 @@ The result of the experiment: This is not a proper solution to reading temperatu
 
 It can be seen, the Temperature conversion time has a massive jitter. 70 to 100ms (5 period of the line sine wave(50Hz)). In this range a specific IC can be anywhere, so we can't hold the precise timings.
 
-### 2.6 Thermocouple interface with a precision opamp (The final solution)
+### 2.6 Thermocouple interface with a precision opamp (final solution)
 
 What is the precison opamp? And what precison we need to perform here? In this case we have N x 10uV voltage on the thermocouple sensor. At 500°C temperature the sensor gives 10-20mV signal. We have 12bit, 3.3V ADC in the STM32. This means 4096 unit in 3.3V range. One unit is 3.3V/4096=0,0008056640625 => 0.8056640625mV =>805.6640625uV. We have 26uV Siebeck-coefficient, so the error would be 805.6640625uV/26uV/°C=31°C. This is why we need to condition the thermocouple's signal. 
 There is 2 important requirements with the opamp
@@ -114,7 +114,7 @@ Because this soldering station designed for a single 24V AC supply the power sta
 The MCU supply is galvanically separated from the rectified and puffered input supply with an isolated [Murata NCS3S4805SC](https://power.murata.com/datasheet?/data/power/ncl/kdc_ncs3.pdf) DC-DC converter .
 
 ### 2.8 The complete schematic drawing
-To sum it up, here is the whole schematic drawing according to above mentioned points. 
+To sum it up, [here is the whole schematic](https://github.com/foldvarid93/JBC_SolderingStation/blob/master/Hardware/Project%20Outputs%20for%20JBC_SolderingIron/Schematic.PDF) drawing according to above mentioned points. 
 You can see that I used a precision amplifier instead of a thermocouple interface IC. 
 ![2020-01-26_10h13_12](https://user-images.githubusercontent.com/41072101/73133107-8ace5600-4024-11ea-8c63-d67544de25a5.png)
 
@@ -133,7 +133,8 @@ I ordered my boards with 6 days shipping. The total cost is around 25$, but it c
 ![IMG_2302](https://user-images.githubusercontent.com/41072101/73133544-683f3b80-402a-11ea-9fcb-9eb59c408e8d.JPG)
 ![IMG_2303](https://user-images.githubusercontent.com/41072101/73133545-68d7d200-402a-11ea-8ddb-eb43cb129a42.JPG)
 
-I ordered all of components from RS Components (some components from other local stores near my home). The component BOM can be found here.
+I ordered all of components from RS Components (some components from other local stores near my home). 
+[The component BOM can be found here.](https://github.com/foldvarid93/JBC_SolderingStation/blob/master/Hardware/Project%20Outputs%20for%20JBC_SolderingIron/BOM_JBC_SolderingIron.xls)
 ### 2.11 Final PCB assembly 
 
 ![IMG_0224](https://user-images.githubusercontent.com/41072101/73133752-72af0480-402d-11ea-94ba-533ad89b242f.JPG)
