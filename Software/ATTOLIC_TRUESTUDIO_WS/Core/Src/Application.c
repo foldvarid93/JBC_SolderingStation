@@ -30,6 +30,7 @@ const float VoltageMultiplier = 3.662; //33000000/(4096*220)=3.662
 uint16_t MovingAverage_T_tc = 0;
 uint16_t Points = 0;
 bool OutputState = false;
+uint8_t FirstRunCounter = 0;
 //PID variables
 uint8_t OutputDuty = 10;
 uint8_t OutputDutyFiltered = 0;
@@ -230,7 +231,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 				//ACD+precision OPA
 				//2 measures average
 				ADCData = 0;				//zeroing the variable
-				for (uint8_t i = 0; i < 3; i++) {
+				for (uint8_t i = 0; i < NumberOfADCSampleAvegrage; i++) {
 					HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_RESET); //Release the ADC input
 					HAL_ADC_Start(&hadc1);
 					if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) { //analog read
@@ -239,12 +240,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 					HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_SET); //Pull down the the ADC input
 					HAL_ADC_Stop(&hadc1); //stop the ADC module
 				}
-				ADCData /= 3; //average of the 2 samples
+				ADCData /= NumberOfADCSampleAvegrage; //average of the 2 samples
 				if (ADCData > 3500) {
 					SolderingTipIsRemoved = true;
 					OutputState = false;
 					OutputDuty = 0;
-				} else {
+				}
+				else {
 					SolderingTipIsRemoved = false;
 					OutputState = true;
 					//convert to celsius
@@ -252,6 +254,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 					T_tc = (U_measured / U_seebeck) + T_amb; //Termocoulpe temperature=Measured voltage/seebeck voltage+Ambient temperature (cold junction compensation)
 					MovingAverage_T_tc = ((uint16_t)T_tc * TemperatureMovingAverageCoeff1 + MovingAverage_T_tc * TemperatureMovingAverageCoeff2)/ 100;//exponential filter with 2 sample and lambda=0.8
 					MovingAverage_T_tc = ((MovingAverage_T_tc + 4) / 5) * 5;//rounding to 0 or 5 //MovingAverage_T_tc=T_tc;
+				}
+				if(FirstRunCounter < NumberOfADCSampleAvegrage){
+					OutputState = false;
+					FirstRunCounter++;
 				}
 #ifdef	PID_CTRL
 				//PID begin

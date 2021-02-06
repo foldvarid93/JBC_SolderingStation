@@ -6,7 +6,7 @@
 
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
-//
+/*includes*/
 #include "main.h"
 #include "tim.h"
 #include "stdlib.h"
@@ -24,7 +24,9 @@
 #include "DIALOG.h"
 #include "GUI.h"
 #endif
-//
+/*Defines*/
+#define NumberOfADCSampleAvegrage (3u)
+/*Function declarations*/
 void LCD_text(const char *q);
 void LCD_write(unsigned char c, unsigned char d);
 void LCD_init(void);

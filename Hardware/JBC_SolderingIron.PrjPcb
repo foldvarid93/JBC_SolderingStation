@@ -89,7 +89,7 @@ GenerateClassCluster=0
 DocumentUniqueId=
 
 [Document4]
-DocumentPath=..\..\..\PCB\ALTIUM\LIBRARIES\Lib\PCB_LIB.PcbLib
+DocumentPath=..\..\..\..\PCB\ALTIUM\LIBRARIES\sajatlib\sajatPCB.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -103,10 +103,10 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=YSJVXXWT
+DocumentUniqueId=
 
 [Document5]
-DocumentPath=..\..\..\PCB\ALTIUM\LIBRARIES\Lib\SCH_LIB.SchLib
+DocumentPath=..\..\..\..\PCB\ALTIUM\LIBRARIES\sajatlib\sajatSCH.SchLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -120,7 +120,7 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=BSKKESSP
+DocumentUniqueId=
 
 [Configuration1]
 Name=Default Configuration
