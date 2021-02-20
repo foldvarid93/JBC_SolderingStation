@@ -186,7 +186,7 @@ void PID_Discrete(void){
 }
 ```
 I have implemented the discrete method and there was massive problems with that. As I earlier said we have 11 half period from the sine curve. In the first half period (0th), tip thermocouple's temperature reading need to be performed with an ADC conversion. With 50Hz line sine frequency we have 10ms in each half period. ADC reading is performed in every 11th half period, so the sampling time is 110ms.
-With this refresh period the PID control loop would be (yes it was) too lazy. 
+With this refresh period the PID control loop would be (yes it was) too lazy. Therefore I implemented a continous-like PID control algorithm. See the following chapter. 
 
 #### 4.2.2 - "Continous" PID algorithm
 
@@ -217,13 +217,23 @@ void PID_Continous(void){
 	OutputDutyFiltered=(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100;
 }
 ```
-### 4.3 - User Interface
+### 4.3 - Tuning the control loop  
+For me these coefficients gave the best result. Not particularly large error in temperature (5°C overshoot) and no steady-state error. Quick heating and reaction for the disturbances thanks to the derivative term. Feel free to take some experiments in tuning your control loop to meet your demands. 
+
+| Coefficient Name       | Value  |
+|------------------------|--------|
+| Proportional gain - Kp | 1.7    |
+| Integral gain - Ki     | 0.15   |
+| Derivative gain - Kd   | 0.5    |
+
+
+### 4.4 - User Interface
 
 I used the free STemWin GUI library to give a simple graphic user interface for this project. As in my other projects also in this was used an inexpensive 240x320 pixel LCD module from ebay. To avoid problems I used my own low level driver for this Arduino typed LCD module.
 
 ![IMG_1645](https://user-images.githubusercontent.com/41072101/64068853-74bb9580-cc3e-11e9-9b0a-3bea928fe507.JPG)
 
-### 4.4 - J4 Connector
+### 4.5 - J4 Connector
 
 ##### SNC - SolderingironNotConnected: 
 The system can sense the unconnected soldering iron, if you use this function. If you don't want to use, make permanent connection between GND and SNC input. If you need this feature, find the way that can connect SNC to GND when soldering iron is plugged in. My solution was that I modified the connector of the soldering iron. I soldered a free pin to the GND in the connector. When the solderint iron's connector is not connected to it's socket the SNC input will be high thanks to he pullup. When the iron's connector is plugged in to the socket, the SNC sense input will be GND (thanks to the SNC pin that shorted to the GND in the iron's connector). So this simple way can be used to determine iron is connected or not to the soldering station.        
@@ -231,11 +241,11 @@ The system can sense the unconnected soldering iron, if you use this function. I
 ##### SLEEP:   
 It can sense if the soldering iron is in its holder. You need to make your holder from a conductor type material, I recommend aluminum, brass and copper... You need to connect the SLEEP sense input to the holder, and when you put the iron into the holder, that make contact between the ring at the lower end of the iron and the holder. The SLEEP input will be dragged down to the GND potential and the software will handle SLEEP state.  
 
-### 4.5 - Final software
+### 4.6 - Final software
 
 [The software can be found here.](https://github.com/foldvarid93/JBC_SolderingStation/tree/master/Software)
 
-### 4.6 - Tests and validations
+### 4.7 - Tests and validations
 
 ![scope2](https://user-images.githubusercontent.com/41072101/74594285-c2815a00-5034-11ea-87ce-97bb2a659682.png)
 ![scope4](https://user-images.githubusercontent.com/41072101/74594286-c3b28700-5034-11ea-92b7-80c9d7409a3d.png)
