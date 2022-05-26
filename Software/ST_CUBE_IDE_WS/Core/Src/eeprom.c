@@ -425,6 +425,20 @@ uint16_t EE_ReadVariable(uint16_t VirtAddress, uint16_t* Data)
   *           - NO_VALID_PAGE: if no valid page was found
   *           - Flash error code: on write Flash error
   */
+uint16_t EE_ReadCharArray(uint16_t VirtAddress, uint16_t Data)
+{
+
+}
+/**
+  * @brief  Writes/upadtes variable data in EEPROM.
+  * @param  VirtAddress: Variable virtual address
+  * @param  Data: 16 bit data to be written
+  * @retval Success or error status:
+  *           - FLASH_COMPLETE: on success
+  *           - PAGE_FULL: if valid page is full
+  *           - NO_VALID_PAGE: if no valid page was found
+  *           - Flash error code: on write Flash error
+  */
 uint16_t EE_WriteVariable(uint16_t VirtAddress, uint16_t Data)
 {
   uint16_t Status = 0;

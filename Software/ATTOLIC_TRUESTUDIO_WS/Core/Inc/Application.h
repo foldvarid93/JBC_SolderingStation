@@ -11,6 +11,7 @@
 #include "tim.h"
 #include "stdlib.h"
 #include "string.h"
+#include "stdio.h"
 #include "math.h"
 #include "adc.h"
 #include "i2c.h"
