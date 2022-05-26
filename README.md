@@ -246,19 +246,39 @@ It can sense if the soldering iron is in its holder. You need to make your holde
 [The software can be found here.](https://github.com/foldvarid93/JBC_SolderingStation/tree/master/Software)
 
 ### 4.7 - Tests and validations
+As picture show there are 11 half period, in the first period ADC measurement is performed for the thermocouple of the tip. In the left 10 periods the PID calculates the output power demands and controls the triac to hold the setpoint independently of the load on the tip.  
 
 ![scope2](https://user-images.githubusercontent.com/41072101/74594285-c2815a00-5034-11ea-87ce-97bb2a659682.png)
 ![scope4](https://user-images.githubusercontent.com/41072101/74594286-c3b28700-5034-11ea-92b7-80c9d7409a3d.png)
 
-## 5 - Housing design, 3D printing
+## 5 - Soldering iron holder  
+I found that it would be easier if I buy a professional holder with tip cleaner. 
 
-## 6 - Build up
+![IMG_4958](https://user-images.githubusercontent.com/41072101/170428895-0d5d626d-edac-417d-ac74-fb0670ac9691.JPG)
+
+### 5.1 - Wiring of the soldering iron holder 
+There are some additional function on the soldering station.   
+-Can detects the connected or not connected soldering iron.
+-Can detects if the soldering iron is in iron holder, and switch to lower temperature range to extend tip's lifetime. This is the sleep function. 
+-Can detects if tip will be changed, and switches off the heating power.
+-Can detects if soldering tip is removed.
+
+#### Wiring schematic: 
+
+![Wiring](https://user-images.githubusercontent.com/41072101/170459518-a9a2f444-0d7c-403f-9a59-3e83bf8165d0.png)
+Modifications:  
+-To get the soldering iron not connected (SNC) functionality you need to make a shortcircuit between PIN6 and PIN1 of the soldering iron's male connector.  
+-To get the tip change functionality you need to modify the schematic. You need to add an other transistor and some resistors like as SNC and SLEEP. New pin need to be configured as input and handled by the software.   
+
+#### (This is ongoing, update will come!)  
+
+## 6 - House
 
 ## 7 - Tests, conclusions
 
 ## 8 - Additinal informations
 
-## 9 - Some pictures from the station
+## 9 - Some pictures of the complete soldering station
 
 ![IMG_1646](https://user-images.githubusercontent.com/41072101/64068854-75542c00-cc3e-11e9-8e9e-f17c2271b396.JPG)
 ![IMG_1636](https://user-images.githubusercontent.com/41072101/64068855-7a18e000-cc3e-11e9-8ed5-411b4704acae.JPG)

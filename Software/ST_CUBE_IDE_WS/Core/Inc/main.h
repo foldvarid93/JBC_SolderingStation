@@ -29,6 +29,10 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "GUI.h"
 #include "DIALOG.h"
 #include "stdlib.h"
@@ -36,9 +40,6 @@ extern "C" {
 #include "string.h"
 #include "LCDConf.h"
 #include "stdbool.h"
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -96,14 +97,11 @@ void Error_Handler(void);
 #define SWDIO_GPIO_Port GPIOA
 #define SWDCLK_Pin GPIO_PIN_14
 #define SWDCLK_GPIO_Port GPIOA
-#define SLEEP_Pin GPIO_PIN_15
-#define SLEEP_GPIO_Port GPIOA
-#define SLEEP_EXTI_IRQn EXTI15_10_IRQn
 #define LCD_RST_Pin GPIO_PIN_10
 #define LCD_RST_GPIO_Port GPIOC
-#define ENC_BUT_Pin GPIO_PIN_11
-#define ENC_BUT_GPIO_Port GPIOC
-#define ENC_BUT_EXTI_IRQn EXTI15_10_IRQn
+#define SLEEP_Pin GPIO_PIN_11
+#define SLEEP_GPIO_Port GPIOC
+#define SLEEP_EXTI_IRQn EXTI15_10_IRQn
 #define LCD_D3_Pin GPIO_PIN_3
 #define LCD_D3_GPIO_Port GPIOB
 #define LCD_D4_Pin GPIO_PIN_4
