@@ -265,7 +265,7 @@ There are some additional function on the soldering station.
 
 #### Wiring schematic: 
 
-![Wiring](https://user-images.githubusercontent.com/41072101/170459518-a9a2f444-0d7c-403f-9a59-3e83bf8165d0.png)
+![Wiring](https://user-images.githubusercontent.com/41072101/180962477-5a515968-ea49-44dc-92b8-9db702b09d76.png)
 Modifications:  
 -To get the soldering iron not connected (SNC) functionality you need to make a shortcircuit between PIN6 and PIN1 of the soldering iron's male connector.  
 -To get the tip change functionality you need to modify the schematic. You need to add an other transistor and some resistors like as SNC and SLEEP. New pin need to be configured as input and handled by the software.   
