@@ -7,17 +7,18 @@ Here is some already existing projects.
 - [Great Scot](https://www.instructables.com/id/DIY-Arduino-Soldering-Station)
 - [Sparkybg](http://dangerousprototypes.com/forum/index.php?topic=7218.0#p61175)
 
-## There are some basic problems with those solution:
+## Criterias
+There are some basic problems with those solution. I don't have an Arduino and I don't want to use that. 
 
-- I don't have an arduino and I don't want to use that. 
-- I wanted to use PID control to provide stable temperature at the end of the tip. 
-- I wanted to use LCD display that I have bought a long-long time ago. 
-- I wanted to build the HW with components that I already had.
-- I would implemented the sleep function.
-- 3D printed housing with individual design. 
-- Individual PCB design.
-- I wanted an encoder as user input.
-- I wanted to use SPI thermocouple interface IC. 
+**I wanted to...** 
+- Use PID control to provide stable temperature on the end of the tip :heavy_check_mark:
+- Use LCD display that I have bought long-long time ago :heavy_check_mark:
+- Build the HW with components that I already had :heavy_check_mark:
+- Implement sleep function :heavy_check_mark:
+- Make 3D printed housing with individual design :heavy_check_mark:
+- Have individual PCB design :heavy_check_mark:
+- Use encoder as user input :heavy_check_mark:
+- Use SPI thermocouple interface IC :heavy_multiplication_x:
 
 So, to sum up the above mentioned point there is no universal solution. Okay, Unisolder would be the best choice, but I only want a JBC 470 compatible contoller. I can't flash PICs, and the schematic is overcomplicated.(Nevertheless, I know that is an UNIversal SOLution for any types of solDERing irons...)
 So I have decided that I will create my own project. The main goal was to create a good and cheap alternative, and during the prototyping I would have to learnt (PID, programming, signal processing, a little power electronics, Matlab, etc).   
