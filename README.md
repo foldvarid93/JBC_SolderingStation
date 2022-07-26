@@ -20,8 +20,8 @@ There are some basic problems with those solution. I don't have an Arduino and I
 - Use encoder as user input :heavy_check_mark:
 - Use SPI thermocouple interface IC :heavy_multiplication_x:
 
-So, to sum up the above mentioned point there is no universal solution. Okay, Unisolder would be the best choice, but I only want a JBC 470 compatible contoller. I can't flash PICs, and the schematic is overcomplicated.(Nevertheless, I know that is an UNIversal SOLution for any types of solDERing irons...)
-So I have decided that I will create my own project. The main goal was to create a good and cheap alternative, and during the prototyping I would have to learnt (PID, programming, signal processing, a little power electronics, Matlab, etc).   
+So, to sum up the above mentioned points there is no universal solution. Okay, Unisolder would be the best choice, but I only want a JBC 470 compatible controller. I can't flash PICs, and the schematic is overcomplicated. (Nevertheless, I know that is an UNIversal SOLution for any types of solDERing irons...)
+So I have decided that I will create my own project. The main goal was to create a good and cheap alternative, and during the prototyping I would have to learn (PID, programming, signal processing, a little power electronics, Matlab, etc).   
 
 ## 1 First steps
 
