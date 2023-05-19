@@ -36,9 +36,9 @@ uint8_t OutputDuty = 10;
 uint8_t OutputDutyFiltered = 0;
 float Ts = 0.11;
 uint8_t N = 5;
-float Kp = 0;
-float Ki = 0;
-float Kd = 0;
+float Kp = 1.7;
+float Ki = 0.15;
+float Kd = 0.5;
 float E0 = 0;
 float E1 = 0;
 float E2 = 0;
@@ -89,7 +89,7 @@ bool CounterFlag = false;
 #define ChangedEncoderValueOnScreenPeriod 4//4*BlinkingPeriod
 #define TemperatureMovingAverageCoeff1 60//must be between 0 and 1
 #define TemperatureMovingAverageCoeff2 (100-TemperatureMovingAverageCoeff1)
-#define OutputDutyFilterCoeff1 15//must be between 0 and 1
+#define OutputDutyFilterCoeff1 50//must be between 0 and 1
 #define OutputDutyFilterCoeff2 (100-OutputDutyFilterCoeff1)
 #define EncoderOffset 0x7FFF
 //
@@ -170,6 +170,7 @@ void SendMeasurements(void) {
 	strcat(UartTxData, "\r\n");
 	//send
 	HAL_UART_Transmit(&huart2, (uint8_t*) UartTxData, strlen(UartTxData), 100);
+	Points++;
 }
 //PID_discrete
 void PID_Continous(void){
@@ -191,7 +192,7 @@ void PID_Continous(void){
 		U0 = 0;
 	}
 	OutputDuty = (((int16_t) U0) / 10) * 10;
-	OutputDutyFiltered=(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100;
+	OutputDutyFiltered=((((OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100)+9)/10)*10;
 }
 //
 void PID_Discrete(void){
@@ -224,24 +225,31 @@ void PID_Discrete(void){
 	OutputDutyFiltered=(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100;
 }
 //external interrupt
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if (GPIO_Pin == INT_ZC_Pin) {
-		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 1) { // if GPIO==0 falling edge after zero crossing
-			if (Index == 0) { //under the first half-wave ADC measurement is performed
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == INT_ZC_Pin)
+	{
+		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 1) // if GPIO==0 falling edge after zero crossing
+			{
+			if (Index == 0) //under the first half-wave ADC measurement is performed
+				{
 				//ACD+precision OPA
 				//2 measures average
 				ADCData = 0;				//zeroing the variable
-				for (uint8_t i = 0; i < NumberOfADCSampleAvegrage; i++) {
+				for (uint8_t i = 0; i < NumberOfADCSampleAvegrage; i++)
+				{
 					HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_RESET); //Release the ADC input
 					HAL_ADC_Start(&hadc1);
-					if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) { //analog read
+					if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) //analog read
+					{
 						ADCData += HAL_ADC_GetValue(&hadc1); //Add new adc value to the variable
 					}
 					HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_SET); //Pull down the the ADC input
 					HAL_ADC_Stop(&hadc1); //stop the ADC module
 				}
 				ADCData /= NumberOfADCSampleAvegrage; //average of the 2 samples
-				if (ADCData > 3500) {
+				if (ADCData > 3500)
+				{
 					SolderingTipIsRemoved = true;
 					OutputState = false;
 					OutputDuty = 0;
@@ -254,18 +262,25 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 					T_tc = (U_measured / U_seebeck) + T_amb; //Termocoulpe temperature=Measured voltage/seebeck voltage+Ambient temperature (cold junction compensation)
 					MovingAverage_T_tc = ((uint16_t)T_tc * TemperatureMovingAverageCoeff1 + MovingAverage_T_tc * TemperatureMovingAverageCoeff2)/ 100;//exponential filter with 2 sample and lambda=0.8
 					MovingAverage_T_tc = ((MovingAverage_T_tc + 4) / 5) * 5;//rounding to 0 or 5 //MovingAverage_T_tc=T_tc;
+					if (MovingAverage_T_tc > SetPoint * 1.1)
+					{
+						OutputState = false;
+					}
 				}
-				if(FirstRunCounter < NumberOfADCSampleAvegrage){
+				if(FirstRunCounter < NumberOfADCSampleAvegrage)
+				{
 					OutputState = false;
 					FirstRunCounter++;
 				}
 #ifdef	PID_CTRL
 				//PID begin
-				if (OutputState == true) {
+				if (OutputState == true)
+				{
 					//PID_Discrete();
 					PID_Continous();
 				}
-				else {
+				else
+				{
 					OutputDuty = 0;
 				}
 				//PID end
@@ -274,53 +289,67 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 				//do nothing
 #endif
 				//sending measurements
-				SendMeasurements();
-				Points++;
+				//SendMeasurements();
 			}
 			Index++;
-			if (Index == 11) {
+			if (Index == 11)
+			{
 				Index = 0;
 			}
 		}
 		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 0) {// rising edge before zero crossing
-			if (Index == 0) {
+			if (Index == 0)
+			{
 				HAL_GPIO_WritePin(HEATING_GPIO_Port, HEATING_Pin,GPIO_PIN_RESET); //output off
 			}
-			else {
-				if (OutputState == true) {
+			else
+			{
+				if (OutputState == true)
+				{
 #ifdef HYST_CTRL
-					if (HAL_GPIO_ReadPin(HEATING_GPIO_Port, HEATING_Pin) == 1) { //Output=1
-						if (MovingAverage_T_tc >= (SetPoint + 5)) {
+					if (HAL_GPIO_ReadPin(HEATING_GPIO_Port, HEATING_Pin) == 1) //Output=1
+						{
+						if (MovingAverage_T_tc >= (SetPoint + 5))
+						{
 							HAL_GPIO_WritePin(HEATING_GPIO_Port, HEATING_Pin,GPIO_PIN_RESET); //output off
 						}
 					}
-					if (HAL_GPIO_ReadPin(HEATING_GPIO_Port, HEATING_Pin) == 0) { //Output=0
-						if (MovingAverage_T_tc <= (SetPoint - 5)) {
+					if (HAL_GPIO_ReadPin(HEATING_GPIO_Port, HEATING_Pin) == 0)  //Output=0
+						{
+						if (MovingAverage_T_tc <= (SetPoint - 5))
+						{
 							HAL_GPIO_WritePin(HEATING_GPIO_Port, HEATING_Pin,GPIO_PIN_SET); //output on
 						}
 					}
 #endif
 #ifdef PID_CTRL
-					if (Index < (OutputDuty / 10) + 1) {
+					if (Index <= (OutputDuty / 10))
+					{
 						HAL_GPIO_WritePin(HEATING_GPIO_Port, HEATING_Pin,GPIO_PIN_SET); //output on
 					}
-					else {
+					else
+					{
 						HAL_GPIO_WritePin(HEATING_GPIO_Port, HEATING_Pin,GPIO_PIN_RESET); //output off
 					}
 #endif
 				}
-				else {
+				else
+				{
 					HAL_GPIO_WritePin(HEATING_GPIO_Port, HEATING_Pin,GPIO_PIN_RESET); //output off
 				}
 			}
 		}
 	}
-	if (GPIO_Pin == ENC_BUT_Pin) { //Encoder button
-		if (HAL_GPIO_ReadPin(ENC_BUT_GPIO_Port, ENC_BUT_Pin) == 0) { // if GPIO==0 -> falling edge
+	if (GPIO_Pin == ENC_BUT_Pin) //Encoder button
+		{
+		if (HAL_GPIO_ReadPin(ENC_BUT_GPIO_Port, ENC_BUT_Pin) == 0)  // if GPIO==0 -> falling edge
+		{
 		}
-		if (HAL_GPIO_ReadPin(ENC_BUT_GPIO_Port, ENC_BUT_Pin) == 1) { // rising edge
+		if (HAL_GPIO_ReadPin(ENC_BUT_GPIO_Port, ENC_BUT_Pin) == 1)  // rising edge
+		{
 			//store actual encoder value to flash
-			if (FlashWriteEnabled) {
+			if (FlashWriteEnabled)
+			{
 				ChangedEncoderValueOnScreen=ChangedEncoderValueOnScreenPeriod;
 				uint16_t tmpWrite = SetPointBackup / 10;
 				uint16_t tmpRead;
@@ -328,7 +357,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 				{
 					Error_Handler();
 				}
-				if (tmpRead != tmpWrite) {
+				if (tmpRead != tmpWrite)
+				{
 					if((EE_WriteVariable(0x0001,  tmpWrite)) != HAL_OK)
 					{
 						Error_Handler();
@@ -337,21 +367,26 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 					{
 						Error_Handler();
 					}
-					if (tmpWrite != tmpRead) {
+					if (tmpWrite != tmpRead)
+					{
 						//flash write error
 						asm("nop");//for debugging
-					} else {
+					} else
+					{
 						//flash write ok
 						asm("nop");//for debugging
 					}
 				}
 			}
-			else {
+			else
+			{
 				asm("nop");//for debugging
 			}
 		}
 	}
-	if (GPIO_Pin == SLEEP_Pin) {			//Encoder button
+	if (GPIO_Pin == SLEEP_Pin)			//Sleep Pin
+	{
+
 	}
 }
 //system timer 1ms
@@ -727,7 +762,7 @@ void MainInit(void) {
 		Kp/=100;
 	}
 	else{
-		Kp=0;
+		Kp=1.7;
 	}
 	//
 	if ((EE_ReadVariable(0x0003, &tmp)) == HAL_OK) {//ki
@@ -735,7 +770,7 @@ void MainInit(void) {
 		Ki/=100;
 	}
 	else{
-		Ki=0;
+		Ki=0.15;
 	}
 	//
 	if ((EE_ReadVariable(0x0004, &tmp)) == HAL_OK) {//kd
@@ -743,7 +778,7 @@ void MainInit(void) {
 		Kd/=100;
 	}
 	else{
-		Kd=0;
+		Kd=0.5;
 	}
 	//
 	HAL_UART_Receive_IT(&huart2, (uint8_t*)UartRxData, 39);
