@@ -24,6 +24,8 @@
 #include "DIALOG.h"
 #include "GUI.h"
 #include "main.h"
+#include "WindowDLG.h"
+#include "string.h"
 /*********************************************************************
 *
 *       Defines
@@ -57,17 +59,16 @@
 WM_HWIN hDialog;
 WM_HWIN hText_0;//Set Temperature
 WM_HWIN hText_1;//setpoint
-WM_HWIN hText_2;//°C
+WM_HWIN hText_2;//ï¿½C
 WM_HWIN hText_3;//Soldering Iron Temperature
 WM_HWIN hText_4;//actual temp
-WM_HWIN hText_5;//°C
+WM_HWIN hText_5;//ï¿½C
 WM_HWIN hText_6;//Heating power
 WM_HWIN hProgbar_0;//progress bar
 //
 /*********************************************************************/
 //user function prototypes
-extern void StateMachine(void);
-void Init_GUI(void);
+
 //
 // USER END
 /*********************************************************************
@@ -139,10 +140,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0x00FFFFFF));
     //
-    // Initialization of °C
+    // Initialization of ï¿½C
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
-    TEXT_SetText(hItem,"°C");
+    char tmpdeg[] = {176,'C',0};
+    TEXT_SetText(hItem, tmpdeg);
     TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0x00FFFFFF));
     TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     TEXT_SetFont(hItem, GUI_FONT_32B_1);
@@ -158,7 +160,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     // Initialization of 'Text'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_5);
-    TEXT_SetText(hItem, "°C");
+    TEXT_SetText(hItem, tmpdeg);
     TEXT_SetTextColor(hItem, GUI_MAKE_COLOR(0x00FFFFFF));
     TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     TEXT_SetFont(hItem, GUI_FONT_32B_1);

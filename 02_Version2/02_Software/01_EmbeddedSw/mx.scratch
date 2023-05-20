@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ScratchFile FileVersion="3.0">
   <FileVersion>3.0</FileVersion>
   <Workspace>
     <WorkspaceType>Single-project</WorkspaceType>
-    <WorkspacePath>D:\Elektronika\ARM\Projects\JCB_SolderingStation\Software\CUBE_IDE_WS\</WorkspacePath>
+    <WorkspacePath>D:\01_Elektronika\00_Projects\JCB_SolderingStation\02_Version2\02_Software\01_EmbeddedSw\</WorkspacePath>
     <underRoot>true</underRoot>
     <TrustZone>0</TrustZone>
-    <HAL_Driver>C:\Users\David\STM32Cube\Repository\STM32Cube_FW_F4_V1.24.1</HAL_Driver>
+    <HAL_Driver>C:\Users\david\STM32Cube\Repository\STM32Cube_FW_F4_V1.27.1</HAL_Driver>
     <CMSIS>Drivers/CMSIS</CMSIS>
     <Toolchain>STM32CubeIDE</Toolchain>
     <IocFile>JBC_SolderingIron_446RE.ioc</IocFile>
     <Project>
       <ProjectName>JBC_SolderingIron_446RE</ProjectName>
       <ProjectNature>C</ProjectNature>
-      <Secure/>
-      <filestoremove/>
+      <Secure />
+      <filestoremove />
       <sourceEntriesToRemove>
-        <sourceEntry/>
+        <sourceEntry />
       </sourceEntriesToRemove>
       <configs>
         <config>
@@ -27,48 +27,52 @@
           <cpucore>Arm Cortex-M4</cpucore>
           <fpu>SP</fpu>
           <memories>
-            <memory access="xrw" name="RAM" size="128" start="0x20000000"/>
-            <memory access="rx" name="FLASH" size="512" start="0x8000000"/>
+            <memory access="xrw" name="RAM" size="128" start="0x20000000" />
+            <memory access="rx" name="FLASH" size="512" start="0x8000000" />
           </memories>
-          <startup>C:\Users\David\STM32Cube\Repository\STM32Cube_FW_F4_V1.24.1\Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\gcc\startup_stm32f446xx.s</startup>
+          <startup>C:\Users\david\STM32Cube\Repository\STM32Cube_FW_F4_V1.27.1\Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\gcc\startup_stm32f446xx.s</startup>
           <LinkSettings>
-            <LinkAdditionalLibs/>
+            <LinkAdditionalLibs />
           </LinkSettings>
           <heapSize>0x200</heapSize>
           <stackSize>0x400</stackSize>
+          <cpuclock>180</cpuclock>
           <board>custom</board>
           <debugprobe>swd</debugprobe>
-          <optimization/>
+          <optimization />
           <Aincludes>
-            <include/>
+            <include />
           </Aincludes>
-          <Adefines/>
+          <Adefines />
           <Cdefines>
             <define>USE_HAL_DRIVER</define>
             <define>STM32F446xx</define>
           </Cdefines>
-          <Ldefines/>
+          <Ldefines />
           <Cincludes>
             <include>Core\Inc</include>
             <include>Drivers\STM32F4xx_HAL_Driver\Inc</include>
             <include>Drivers\STM32F4xx_HAL_Driver\Inc\Legacy</include>
+            <include>Middlewares\Third_Party\FreeRTOS\Source\include</include>
+            <include>Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</include>
+            <include>Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM4F</include>
             <include>Drivers\CMSIS\Device\ST\STM32F4xx\Include</include>
             <include>Drivers\CMSIS\Include</include>
           </Cincludes>
           <definestoremove>
-            <Adefines/>
+            <Adefines />
             <Cdefines>
               <define>USE_FULL_LL_DRIVER</define>
               <define>MBEDTLS_CONFIG_FILE="mbedtls_config.h"</define>
               <define>USE_FULL_ASSERT=1U</define>
             </Cdefines>
-            <Ldefines/>
+            <Ldefines />
           </definestoremove>
           <inctoremove>
             <Aincludes>
-              <include/>
+              <include />
             </Aincludes>
-            <Cincludes/>
+            <Cincludes />
           </inctoremove>
         </config>
       </configs>
@@ -80,8 +84,12 @@
         <sourceEntry>
           <name>Drivers</name>
         </sourceEntry>
+        <sourceEntry>
+          <name>Middlewares</name>
+        </sourceEntry>
       </sourceEntries>
-      <Groups/>
+      <Groups />
     </Project>
   </Workspace>
 </ScratchFile>
+

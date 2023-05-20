@@ -29,7 +29,6 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -113,9 +112,11 @@ void Error_Handler(void);
 #define LCD_CS_GPIO_Port GPIOB
 #define LCD_RS_Pin GPIO_PIN_9
 #define LCD_RS_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 #define LCD_DATA_PORT GPIOB
-#define 	LCDTFT
+#define LCDTFT
+#define DEBUG
 //#define 	HD44780
 
 #define 	PID_CTRL
@@ -127,5 +128,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -22,8 +22,9 @@ bool EncoderChanged=false;
 uint8_t ChangedEncoderValueOnScreen=0;
 //Temperature measurement varables
 float ADCData = 0;
+float TEST_ADCData;
 float T_tc = 0;
-float T_amb = 23;
+float T_amb = 20;
 float U_measured;
 const float U_seebeck = 26.2;
 const float VoltageMultiplier = 3.662; //33000000/(4096*220)=3.662
@@ -87,10 +88,10 @@ bool CounterFlag = false;
 //defines
 #define BlinkingPeriod 750//ms period time of blinking texts
 #define ChangedEncoderValueOnScreenPeriod 4//4*BlinkingPeriod
-#define TemperatureMovingAverageCoeff1 60//must be between 0 and 1
-#define TemperatureMovingAverageCoeff2 (100-TemperatureMovingAverageCoeff1)
-#define OutputDutyFilterCoeff1 50//must be between 0 and 1
-#define OutputDutyFilterCoeff2 (100-OutputDutyFilterCoeff1)
+#define TemperatureMovingAverageCoeff1 0.6 /*must be between 0 and 1*/
+#define TemperatureMovingAverageCoeff2 (1-TemperatureMovingAverageCoeff1)
+#define OutputDutyFilterCoeff1 0.5//must be between 0 and 1
+#define OutputDutyFilterCoeff2 (1-OutputDutyFilterCoeff1)
 #define EncoderOffset 0x7FFF
 //
 //#define SendMeasurementsTimer
@@ -99,9 +100,6 @@ bool CounterFlag = false;
 #endif
 /* USER CODE END PV */
 //
-#ifdef LCDTFT
-extern void Init_GUI(void);
-#endif
 //
 // Converts a floating point number to string.
 //float to char array conversion
@@ -172,7 +170,7 @@ void SendMeasurements(void) {
 	HAL_UART_Transmit(&huart2, (uint8_t*) UartTxData, strlen(UartTxData), 100);
 	Points++;
 }
-//PID_discrete
+/*PID Continous*/
 void PID_Continous(void){
 	E1 = E0;
 	E0 = SetPoint - T_tc;
@@ -191,10 +189,10 @@ void PID_Continous(void){
 	if (U0 < 0) {
 		U0 = 0;
 	}
-	OutputDuty = (((int16_t) U0) / 10) * 10;
-	OutputDutyFiltered=((((OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered)/100)+9)/10)*10;
+	OutputDuty = (((int8_t) U0) / 10) * 10;
+	OutputDutyFiltered  = (((uint8_t)(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered))/10)*10;
 }
-//
+/*PID Continous*/
 void PID_Discrete(void){
 	b0 = (Kp * (1 + N * Ts)) + (Ki * Ts * (1 + N * Ts))	+ (Kd * N);
 	b1 = -((Kp * (2 + N * Ts)) + (Ki * Ts) + (2 * Kd * N));
@@ -227,40 +225,47 @@ void PID_Discrete(void){
 //external interrupt
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+/*----------------------------------------------------------------------------------------------*/
+/*Zero Crossing Detector External Interrupt*/
 	if (GPIO_Pin == INT_ZC_Pin)
 	{
-		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 1) // if GPIO==0 falling edge after zero crossing
+		/*if GPIO==0 falling edge after zero crossing*/
+		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 1)
 			{
 			if (Index == 0) //under the first half-wave ADC measurement is performed
 				{
-				//ACD+precision OPA
-				//2 measures average
-				ADCData = 0;				//zeroing the variable
-				for (uint8_t i = 0; i < NumberOfADCSampleAvegrage; i++)
+#ifdef DEBUG
+				ADCData = TEST_ADCData;
+
+#elif			/*ACD+precision OPA*/
+				ADCData = 0;				/*clear the variable*/
+
+				HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_RESET); /*Release the ADC input*/
+
+				/*Start AD conversion*/
+				HAL_ADC_Start(&hadc1);
+
+				if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) /*ADC read*/
 				{
-					HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_RESET); //Release the ADC input
-					HAL_ADC_Start(&hadc1);
-					if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) //analog read
-					{
-						ADCData += HAL_ADC_GetValue(&hadc1); //Add new adc value to the variable
-					}
-					HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_SET); //Pull down the the ADC input
-					HAL_ADC_Stop(&hadc1); //stop the ADC module
+					ADCData = HAL_ADC_GetValue(&hadc1); /*Add new adc value to the variable*/
 				}
-				ADCData /= NumberOfADCSampleAvegrage; //average of the 2 samples
+				HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_SET); /*Pull down the the ADC input*/
+				HAL_ADC_Stop(&hadc1); /*stop the ADC module*/
+#endif
 				if (ADCData > 3500)
 				{
 					SolderingTipIsRemoved = true;
 					OutputState = false;
 					OutputDuty = 0;
 				}
-				else {
+				else
+				{
 					SolderingTipIsRemoved = false;
 					OutputState = true;
 					//convert to celsius
 					U_measured = ADCData * VoltageMultiplier; // measured TC voltage in microvolts = Uadc(LSB) *3.662;
 					T_tc = (U_measured / U_seebeck) + T_amb; //Termocoulpe temperature=Measured voltage/seebeck voltage+Ambient temperature (cold junction compensation)
-					MovingAverage_T_tc = ((uint16_t)T_tc * TemperatureMovingAverageCoeff1 + MovingAverage_T_tc * TemperatureMovingAverageCoeff2)/ 100;//exponential filter with 2 sample and lambda=0.8
+					MovingAverage_T_tc = (uint16_t)(T_tc * TemperatureMovingAverageCoeff1 + MovingAverage_T_tc * TemperatureMovingAverageCoeff2);//exponential filter with 2 sample and lambda=0.8
 					MovingAverage_T_tc = ((MovingAverage_T_tc + 4) / 5) * 5;//rounding to 0 or 5 //MovingAverage_T_tc=T_tc;
 					if (MovingAverage_T_tc > SetPoint * 1.1)
 					{
@@ -273,17 +278,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 					FirstRunCounter++;
 				}
 #ifdef	PID_CTRL
-				//PID begin
-				if (OutputState == true)
-				{
-					//PID_Discrete();
-					PID_Continous();
-				}
-				else
+				/*PID start*/
+				PID_Continous();
+
+				if (OutputState == false)
 				{
 					OutputDuty = 0;
 				}
-				//PID end
+				/*PID end*/
 #endif
 #ifdef HYST_CTRL
 				//do nothing
@@ -297,7 +299,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 				Index = 0;
 			}
 		}
-		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 0) {// rising edge before zero crossing
+		/*rising edge before zero crossing*/
+		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 0)
+		{
 			if (Index == 0)
 			{
 				HAL_GPIO_WritePin(HEATING_GPIO_Port, HEATING_Pin,GPIO_PIN_RESET); //output off
@@ -340,7 +344,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 			}
 		}
 	}
-	if (GPIO_Pin == ENC_BUT_Pin) //Encoder button
+/*----------------------------------------------------------------------------------------------*/
+/*Encoder Button External Interrupt*/
+	if (GPIO_Pin == ENC_BUT_Pin)
 		{
 		if (HAL_GPIO_ReadPin(ENC_BUT_GPIO_Port, ENC_BUT_Pin) == 0)  // if GPIO==0 -> falling edge
 		{
@@ -370,37 +376,50 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 					if (tmpWrite != tmpRead)
 					{
 						//flash write error
-						asm("nop");//for debugging
+						asm("nop");/*debugnop*/
 					} else
 					{
 						//flash write ok
-						asm("nop");//for debugging
+						asm("nop");/*debugnop*/
 					}
 				}
 			}
 			else
 			{
-				asm("nop");//for debugging
+				asm("nop");/*debugnop*/
 			}
 		}
 	}
-	if (GPIO_Pin == SLEEP_Pin)			//Sleep Pin
+/*----------------------------------------------------------------------------------------------*/
+/*Sleep Pin External Interrupt*/
+	if (GPIO_Pin == SLEEP_Pin)
 	{
 
 	}
 }
+/*TIM3 callback*/
+/*void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == TIM3)
+	{
+		HAL_GPIO_EXTI_Callback(INT_ZC_Pin);
+	}
+}*/
 //system timer 1ms
-void HAL_SYSTICK_Callback(void) {
-	OS_TimeMS++;
-	//
+void HAL_SYSTICK_Callback(void)
+{
 	Counter++;
-	if (Counter == BlinkingPeriod) {
-		if (CounterFlag) {
+	if (Counter == BlinkingPeriod)
+	{
+		if (CounterFlag)
+		{
 			CounterFlag = false;
-		} else {
+		} else
+		{
 			CounterFlag = true;
 		}
-		if(ChangedEncoderValueOnScreen>0){
+		if(ChangedEncoderValueOnScreen>0)
+		{
 			ChangedEncoderValueOnScreen--;
 		}
 		Counter = 0;
@@ -414,8 +433,10 @@ void HAL_SYSTICK_Callback(void) {
 #endif
 }
 //Uart functions
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	if (huart->Instance == USART2) {
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->Instance == USART2)
+	{
 		//START: Kp=1.00, Ki=2.00, Kd=0.00 :END
 		//interpreting the incoming data
 		if(		UartRxData[0]=='S' &&
@@ -478,128 +499,77 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 				Error_Handler();
 			}
 		}
-		else{
+		else
+		{
 			HAL_UART_Transmit_IT(&huart2, (uint8_t*) "Wrong format\r\n", 12);
 		}
 		HAL_UART_Receive_IT(&huart2, (uint8_t*)UartRxData, 39);
 	}
 }
 //
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
-	if (huart->ErrorCode == HAL_UART_ERROR_ORE) {
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->ErrorCode == HAL_UART_ERROR_ORE)
+	{
 		HAL_UART_Transmit_IT(&huart2, (uint8_t*) "FAIL\r\n", 6);
 		HAL_UART_Receive_IT(&huart2, (uint8_t*)UartRxData, 39);
 	}
 }
-//LCD functions
-#ifdef HD44780
-void LCD_text(const char *q) {
-	while (*q) {
-		LCD_write(*q++, 0xFF);
-	}
-}
-void LCD_write(unsigned char c, unsigned char d) {
-	if (d == 0x00) {
-		HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_RESET);
-	} else {
-		HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);
-	}
-	HAL_Delay(1);
-	LCD_DATA_PORT->ODR &= 0xFFFFFF00;
-	LCD_DATA_PORT->ODR |= c;
-	HAL_GPIO_WritePin(LCD_E_GPIO_Port, LCD_E_Pin, GPIO_PIN_SET);
-	asm("nop");
-	HAL_GPIO_WritePin(LCD_E_GPIO_Port, LCD_E_Pin, GPIO_PIN_RESET);
-}
-void LCD_init(void) {
-	user_pwm_setvalue(100);
-	HAL_GPIO_WritePin(GPIOB, LCD_E_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(LCD_RW_GPIO_Port, LCD_RW_Pin, GPIO_PIN_RESET);
-
-	HAL_Delay(100);
-	LCD_write(0x38, 0x00);
-	HAL_Delay(1);
-	LCD_write(0x38, 0x00);
-	HAL_Delay(1);
-	LCD_write(0x38, 0x00);
-	LCD_write(0x38, 0x00);
-	LCD_write(0x38, 0x00);
-	LCD_write(0x0C, 0x00); // Make cursorinvisible
-	LCD_write(0x01, 0x00);
-	HAL_Delay(2);
-	LCD_write(0x6, 0x00); // Set entry Mode(auto increment of cursor)
-
-	LCD_write(0x01, 0x00);
-	HAL_Delay(2);
-	LCD_write(0x80, 0x00);
-	LCD_text("Set Temp:");
-	LCD_write(0x8E, 0x00);
-	LCD_text("C");
-	LCD_write(0xC0, 0x00);
-	LCD_text("Iron Temp:");
-	LCD_write(0xD4, 0x00);
-	LCD_text("");
-	LCD_write(0x94, 0x00);
-	LCD_text("");
-}
-//PWM LCD backlight
-void user_pwm_setvalue(uint16_t value) {
-	TIM_OC_InitTypeDef sConfigOC;
-
-	sConfigOC.OCMode = TIM_OCMODE_PWM1;
-	sConfigOC.Pulse = value;
-	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-	HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
-	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-}
 //
-#endif
-//
-void StateMachine(void){
-	if(HAL_GPIO_ReadPin(SLEEP_GPIO_Port,SLEEP_Pin)==1){
+void StateMachine(void)
+{
+	if(HAL_GPIO_ReadPin(SLEEP_GPIO_Port,SLEEP_Pin)==1)
+	{
 		SolderingIronIsInHolder=true;//Soldering iron is in the holder
 	}
-	else{
+	else
+	{
 		SolderingIronIsInHolder=false;//Soldering iron is not in the holder
 	}
-#ifdef LCDTFT
 	//locals
 	char TmpStr[5];
 	uint16_t EncoderReadValue;
 	//
-	if(HAL_GPIO_ReadPin(SNC_GPIO_Port,SNC_Pin)==1){//soldering iron is connected
+	if(HAL_GPIO_ReadPin(SNC_GPIO_Port,SNC_Pin)==1)/*soldering iron is connected*/
+	{
 		SolderingIronNotConnected=false;
 	}
-	else{
+	else
+	{
 		SolderingIronNotConnected=true;
 	}
 	//
-	if(TIM2->CNT<0x8009){//if encoder less than 0x7FFF+0x000A=0x8009 - 100�C
+	if(TIM2->CNT<0x8009)/*if encoder less than 0x7FFF+0x000A=0x8009 - 100�C*/
+	{
 		TIM2->CNT=0x8009;//low level saturation at 0x8009
 	}
-	if(TIM2->CNT>0x802C){//if encoder bigger than 0x7FFF+0x002D=0x802C - 450�C
-		TIM2->CNT=0x802C;//top level saturation at 0x802C
+	if(TIM2->CNT>0x802C)/*if encoder bigger than 0x7FFF+0x002D=0x802C - 450�C*/
+	{
+		TIM2->CNT=0x802C;/*top level saturation at 0x802C*/
 	}
 	EncoderReadValue=(TIM2->CNT-0x7FFF)*10;
-	if(EncoderReadValue!=SetPointBackup){
+	if(EncoderReadValue!=SetPointBackup)
+	{
 		ChangedEncoderValueOnScreen=ChangedEncoderValueOnScreenPeriod;
 	}
 	SetPointBackup=EncoderReadValue;//setpoint is 10*Encoder data-EncoderOffset
 	//
-	if(SolderingTipIsRemoved==true||SolderingIronNotConnected==true){
+	if(SolderingTipIsRemoved==true||SolderingIronNotConnected==true)
+	{
 		PROGBAR_SetValue(hProgbar_0, 0);//output duty
 		if(CounterFlag){
 			TEXT_SetText(hText_4, "0");
-			if(SolderingTipIsRemoved==true){
+			if(SolderingTipIsRemoved==true)
+			{
 				TEXT_SetText(hText_6, "Soldering tip is removed!");
 			}
-			if(SolderingIronNotConnected==true){
+			if(SolderingIronNotConnected==true)
+			{
 				TEXT_SetText(hText_6, "Soldering iron is not connected!");
 			}
 		}
-		else{
+		else
+		{
 			TEXT_SetText(hText_4, " ");
 			TEXT_SetText(hText_6, " ");
 		}
@@ -609,195 +579,104 @@ void StateMachine(void){
 		TEXT_SetText(hText_2, TmpStr);
 		SetPoint=SetPointBackup;
 	}
-	else{
+	else
+	{
 		TEXT_SetText(hText_6, "Heating Power");
 		PROGBAR_SetValue(hProgbar_0, OutputDutyFiltered);//output duty
 		sprintf(TmpStr,"%u",MovingAverage_T_tc);//Soldering iron tip temperature
 		TEXT_SetText(hText_4, TmpStr);
 		//
-		if(SolderingIronIsInHolder==true){
-			if(SetPointBackup>150){
+		if(SolderingIronIsInHolder == true)
+		{
+			if(SetPointBackup>150)
+			{
 				SetPoint=150;
 			}
-			else{
+			else
+			{
 				SetPoint=SetPointBackup;
 			}
-			if(ChangedEncoderValueOnScreen>0){
+			if(ChangedEncoderValueOnScreen>0)
+			{
 			    TEXT_SetText(hText_0, "Soldering\n Temperature");
 				sprintf(TmpStr,"%u",SetPointBackup);
 				TEXT_SetText(hText_2, TmpStr);
 			}
-			else{
-				if(CounterFlag){
+			else
+			{
+				if(CounterFlag)
+				{
 				    TEXT_SetText(hText_0, "Soldering\n Temperature");
 					sprintf(TmpStr,"%u",SetPointBackup);
 					TEXT_SetText(hText_2, TmpStr);
 				}
-				else{
+				else
+				{
 				    TEXT_SetText(hText_0, "Sleep\n Temperature");
 				    sprintf(TmpStr,"%u",SetPoint);
 				    TEXT_SetText(hText_2, TmpStr);//sleep temperature
 				}
 			}
 		}
-		else{
+		else
+		{
 		    TEXT_SetText(hText_0, "Soldering\n Temperature");
 			sprintf(TmpStr,"%u",SetPointBackup);
 			TEXT_SetText(hText_2, TmpStr);
 			SetPoint=SetPointBackup;
 		}
 	}
-#endif
-#ifdef HD44780
-	uint8_t TmpBuf[40];
-	if (TIM2->CNT < 0x8009) {
-		TIM2->CNT = 0x8009;
-	}
-	if (TIM2->CNT > 0x802C) {
-		TIM2->CNT = 0x802C;
-	}
-	SetPointBackup = (TIM2->CNT - EncoderOffset) * 10;
-	//setpoint
-	uint16_t temp = SetPointBackup;
-	uint8_t i = 0;
-	TmpBuf[i] = (temp / 100) + 0x30;		//százas
-	if (TmpBuf[i] != '0') {
-		i++;
-	}
-	temp %= 100;
-	TmpBuf[i++] = (temp / 10) + 0x30;		//tizes
-	temp %= 10;
-	TmpBuf[i++] = temp + 0x30;		//egyes
-	TmpBuf[i++] = ' ';
-	TmpBuf[i++] = 0xDF;		//Celsius fok
-	TmpBuf[i++] = 'C';
-	TmpBuf[i++] = ' ';
-	TmpBuf[i++] = '\0';
-	LCD_write(0x8A, 0x00);		//LCD első sor
-	LCD_text((const char*) TmpBuf);
-
-	//actual temperature
-	if (SolderingTipIsRemoved) {
-		temp = 0;
-	} else {
-		temp = MovingAverage_T_tc;
-	}
-	i = 0;
-	if(temp==0){
-		TmpBuf[i++]='0';
-	}
-	else{
-		TmpBuf[i] = (temp / 100) + 0x30;		//százas
-		if (TmpBuf[i] != '0') {
-			i++;
-		}
-		temp %= 100;
-		TmpBuf[i++] = (temp / 10) + 0x30;		//tizes
-		temp %= 10;
-		TmpBuf[i++] = temp + 0x30;		//egyes
-	}
-	TmpBuf[i++] = ' ';
-	TmpBuf[i++] = 0xDF;		//Celsius fok
-	TmpBuf[i++] = 'C';
-	TmpBuf[i++] = ' ';
-	TmpBuf[i++] = ' ';
-	TmpBuf[i++] = '\0';
-	LCD_write(0xCB, 0x00);		//
-	LCD_text((const char*) TmpBuf);
-	//Sleep
-	if (SolderingTipIsRemoved==1) {
-		FlashWriteEnabled=false;
-		LCD_write(0x94, 0x00);
-		LCD_text("Iron Is Unconnected!");
-	} else if (SolderingIronIsInHolder==1) {
-		FlashWriteEnabled=false;
-		LCD_write(0x94, 0x00);
-		LCD_text("Sleep temp: 150");
-		LCD_write(0xDF, 0xFF);		//Celsius fok
-		LCD_write('C', 0xFF);
-		SetPointBackup = SetPoint;
-		if (SetPoint > 150) {
-			SetPoint = 150;
-		}
-	} else {
-		FlashWriteEnabled=true;
-		LCD_write(0x94, 0x00);
-		LCD_text("                    ");
-		SetPoint = SetPointBackup;
-	}
-	if (OutputState) {
-		LCD_write(0xD4, 0x00);
-		LCD_text("Output: ON ");
-	} else {
-		LCD_write(0xD4, 0x00);
-		LCD_text("Output: OFF");
-	}
-#endif
 }
 //
 void MainInit(void) {
 	uint16_t tmp = 0;
 	HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);//encoder timer2
-#ifdef LCDTFT
-	Init_GUI();//initializing graphics
-#endif
-#ifdef HD44780
-	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);//backlight PWM timer
-	user_pwm_setvalue(100);//set pwm max
-	LCD_init();//init HD44780 LCD
-#endif
-	//read stored temperature value from flash
+	/*read stored temperature value from flash*/
 	HAL_FLASH_Unlock();
-	if (EE_Init() != EE_OK) {
+	if (EE_Init() != EE_OK)
+	{
 		Error_Handler();
 	}
-	if ((EE_ReadVariable(0x0001, &tmp)) == HAL_OK) {
+	if ((EE_ReadVariable(0x0001, &tmp)) == HAL_OK)
+	{
 		TIM2->CNT = (uint8_t) tmp + EncoderOffset;
 	}
-	else{
+	else
+	{
 		TIM2->CNT = 10 + EncoderOffset;//safety default 100�C
 	}
-	if ((EE_ReadVariable(0x0002, &tmp)) == HAL_OK) {//kp
+	if ((EE_ReadVariable(0x0002, &tmp)) == HAL_OK) /*Kp*/
+	{
 		Kp=tmp;
 		Kp/=100;
 	}
-	else{
+	else
+	{
 		Kp=1.7;
 	}
 	//
-	if ((EE_ReadVariable(0x0003, &tmp)) == HAL_OK) {//ki
+	if ((EE_ReadVariable(0x0003, &tmp)) == HAL_OK) /*Ki*/
+	{
 		Ki=tmp;
 		Ki/=100;
 	}
-	else{
+	else
+	{
 		Ki=0.15;
 	}
 	//
-	if ((EE_ReadVariable(0x0004, &tmp)) == HAL_OK) {//kd
+	if ((EE_ReadVariable(0x0004, &tmp)) == HAL_OK) /*Kd*/
+	{
 		Kd=tmp;
 		Kd/=100;
 	}
-	else{
+	else
+	{
 		Kd=0.5;
 	}
 	//
 	HAL_UART_Receive_IT(&huart2, (uint8_t*)UartRxData, 39);
 	SetPointBackup=(TIM2->CNT-0x7FFF)*10;
 	//
-	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);//enable zero crossing interrupt
+	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);/*enable zero crossing interrupt*/
 }
-//
-void MainTask(void) {
-	while (1) {
-#ifdef LCDTFT
-		StateMachine();//
-		GUI_Exec();//gui execution
-		GUI_Delay(50);//gui sleep 50ms
-#endif
-#ifdef HD44780
-		StateMachine();
-		HAL_Delay(200);
-#endif
-	}
-}
-//end
