@@ -397,14 +397,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 	}
 }
-/*TIM3 callback*/
-/*void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	if(htim->Instance == TIM3)
-	{
-		HAL_GPIO_EXTI_Callback(INT_ZC_Pin);
-	}
-}*/
 //system timer 1ms
 void HAL_SYSTICK_Callback(void)
 {

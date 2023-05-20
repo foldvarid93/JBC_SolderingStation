@@ -20,24 +20,10 @@
 #include "gpio.h"
 #include "stdbool.h"
 #include "eeprom.h"
-#ifdef LCDTFT
-#include "crc.h"
-#include "DIALOG.h"
-#include "GUI.h"
-#endif
 /*Defines*/
-#define NumberOfADCSampleAvegrage (3u)
+
 /*Function declarations*/
 void LCD_text(const char *q);
 void LCD_write(unsigned char c, unsigned char d);
 void LCD_init(void);
-void user_pwm_setvalue(uint16_t value);
-void ftoa(float n, char *res, int afterpoint);
-void SendMeasurements(void);
-void MainTask(void);
-void MainInit(void);
-void StateMachine(void);
-extern void StateMachine(void);
-void PID_Discrete(void);
-void PID_Continous(void);
 #endif /* APPLICATION_H_ */
