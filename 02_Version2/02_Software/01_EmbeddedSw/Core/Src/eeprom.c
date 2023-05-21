@@ -427,7 +427,7 @@ uint16_t EE_ReadVariable(uint16_t VirtAddress, uint16_t* Data)
   */
 uint16_t EE_ReadCharArray(uint16_t VirtAddress, uint16_t Data)
 {
-
+	return 0;
 }
 /**
   * @brief  Writes/upadtes variable data in EEPROM.

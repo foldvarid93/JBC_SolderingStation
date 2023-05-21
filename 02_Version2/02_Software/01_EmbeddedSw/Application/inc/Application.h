@@ -20,11 +20,9 @@
 #include "gpio.h"
 #include "stdbool.h"
 #include "eeprom.h"
-#ifdef LCDTFT
 #include "crc.h"
 #include "DIALOG.h"
 #include "GUI.h"
-#endif
 /*Defines*/
 #define NumberOfADCSampleAvegrage (3u)
 /*Function declarations*/
