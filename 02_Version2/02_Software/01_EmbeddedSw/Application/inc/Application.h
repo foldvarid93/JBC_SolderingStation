@@ -23,6 +23,7 @@
 #include "crc.h"
 #include "DIALOG.h"
 #include "GUI.h"
+#include "portmacro.h"
 /*Defines*/
 #define NumberOfADCSampleAvegrage (3u)
 /*Function declarations*/
@@ -38,4 +39,5 @@ void StateMachine(void);
 extern void StateMachine(void);
 void PID_Discrete(void);
 void PID_Continous(void);
+void InterruptTaskHandler(uint16_t);
 #endif /* APPLICATION_H_ */

@@ -116,11 +116,8 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 #define LCD_DATA_PORT GPIOB
 #define LCDTFT
-#define DEBUG
-//#define 	HD44780
-
-#define 	PID_CTRL
-//#define		HYST_CTRL
+#define PID_CTRL
+//#define	DEBUG
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

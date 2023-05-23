@@ -182,8 +182,8 @@ void PID_Continous(void){
 	OutputDuty = (((int8_t) U0) / 10) * 10;
 	OutputDutyFiltered  = (((uint8_t)(OutputDutyFilterCoeff1*OutputDuty+OutputDutyFilterCoeff2*OutputDutyFiltered))/10)*10;
 }
-/*external interrupt*/
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+/*interrupt task handler*/
+void InterruptTaskHandler(uint16_t GPIO_Pin)
 {
 /*----------------------------------------------------------------------------------------------*/
 /*Zero Crossing Detector External Interrupt*/
@@ -197,7 +197,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 #ifdef DEBUG
 				ADCData = TEST_ADCData;
 
-#elif			/*ACD+precision OPA*/
+#else			/*ACD+precision OPA*/
 				ADCData = 0;				/*clear the variable*/
 
 				HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_RESET); /*Release the ADC input*/

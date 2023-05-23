@@ -47,22 +47,25 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-uint32_t OsTaskCounter1;
-uint32_t OsTaskCounter2;
-uint32_t OsTaskCounter3;
+uint32_t OsTaskCounterInitTask;
+uint32_t OsTaskCounterMainTask;
+uint32_t OsTaskCounterGUI_Task;
+uint32_t OsTaskCounterInterruptTask;
 /* USER CODE END Variables */
-osThreadId defaultTaskHandle;
+osThreadId InitTaskHandle;
 osThreadId MainTaskHandle;
 osThreadId GUI_TaskHandle;
+osThreadId InterruptTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void const * argument);
+void InitTask_Func(void const * argument);
 void MainTask_Func(void const * argument);
 void GUI_Task_Function(void const * argument);
+void InterruptTask_Func(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -125,17 +128,21 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  /* definition and creation of InitTask */
+  osThreadDef(InitTask, InitTask_Func, osPriorityNormal, 0, 128);
+  InitTaskHandle = osThreadCreate(osThread(InitTask), NULL);
 
   /* definition and creation of MainTask */
-  osThreadDef(MainTask, MainTask_Func, osPriorityNormal, 0, 128);
+  osThreadDef(MainTask, MainTask_Func, osPriorityNormal, 0, 512);
   MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
 
   /* definition and creation of GUI_Task */
   osThreadDef(GUI_Task, GUI_Task_Function, osPriorityNormal, 0, 2048);
   GUI_TaskHandle = osThreadCreate(osThread(GUI_Task), NULL);
+
+  /* definition and creation of InterruptTask */
+  osThreadDef(InterruptTask, InterruptTask_Func, osPriorityRealtime, 0, 256);
+  InterruptTaskHandle = osThreadCreate(osThread(InterruptTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -143,24 +150,24 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_InitTask_Func */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the InitTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
+/* USER CODE END Header_InitTask_Func */
+void InitTask_Func(void const * argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
+  /* USER CODE BEGIN InitTask_Func */
   /* Infinite loop */
   for(;;)
   {
 	HAL_SYSTICK_Callback();
-	OsTaskCounter1++;
+	OsTaskCounterInitTask++;
     osDelay(1);
   }
-  /* USER CODE END StartDefaultTask */
+  /* USER CODE END InitTask_Func */
 }
 
 /* USER CODE BEGIN Header_MainTask_Func */
@@ -177,9 +184,9 @@ void MainTask_Func(void const * argument)
   for(;;)
   {
 #ifdef DEBUG
-	  HAL_GPIO_EXTI_Callback(INT_ZC_Pin);
+	  HAL_GPIO_EXTI_Callback(ENC_BUT_Pin);
 #endif
-	OsTaskCounter2++;
+	OsTaskCounterMainTask++;
     osDelay(1);
   }
   /* USER CODE END MainTask_Func */
@@ -201,13 +208,59 @@ void GUI_Task_Function(void const * argument)
   {
 	StateMachine();	/**/
 	GUI_Exec();		/*GUI execution*/
-	OsTaskCounter3++;
+	OsTaskCounterGUI_Task++;
     osDelay(80);
   }
   /* USER CODE END GUI_Task_Function */
 }
 
+/* USER CODE BEGIN Header_InterruptTask_Func */
+/**
+* @brief Function implementing the InterruptTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_InterruptTask_Func */
+void InterruptTask_Func(void const * argument)
+{
+	uint32_t EXTI_PIN;
+  /* USER CODE BEGIN InterruptTask_Func */
+  /* Infinite loop */
+  for(;;)
+  {
+	  vTaskSuspend(NULL);
+      xTaskNotifyWait(        0x00,               	/* Don't clear any bits on entry. */
+                              0xFFFFFFFF,          	/* Clear all bits on exit. */
+                              &EXTI_PIN, 			/* Receives the notification value. */
+                              portMAX_DELAY );    	/* Block indefinitely. */
+      switch (EXTI_PIN)
+      {
+      case ENC_BUT_Pin:
+		asm("nop");/*debugnop*/
+    	  break;
+      case SNC_Pin:
+		asm("nop");/*debugnop*/
+    	  break;
+      case SLEEP_Pin:
+		asm("nop");/*debugnop*/
+    	  break;
+      case INT_ZC_Pin:
+		asm("nop");/*debugnop*/
+    	  break;
+      }
+	  InterruptTaskHandler((uint16_t) (EXTI_PIN & 0xFFFF));
+	  OsTaskCounterInterruptTask++;
+  }
+  /* USER CODE END InterruptTask_Func */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	xTaskNotifyFromISR(InterruptTaskHandle, (uint32_t) GPIO_Pin, eSetValueWithOverwrite, NULL);
+	BaseType_t checkIfYieldRequired;
+	checkIfYieldRequired = xTaskResumeFromISR(InterruptTaskHandle);
+	portYIELD_FROM_ISR(checkIfYieldRequired);
+}
 /* USER CODE END Application */
