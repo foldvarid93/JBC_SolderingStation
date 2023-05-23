@@ -137,11 +137,11 @@ void MX_FREERTOS_Init(void) {
   MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
 
   /* definition and creation of GUI_Task */
-  osThreadDef(GUI_Task, GUI_Task_Function, osPriorityNormal, 0, 2048);
+  osThreadDef(GUI_Task, GUI_Task_Function, osPriorityIdle, 0, 2048);
   GUI_TaskHandle = osThreadCreate(osThread(GUI_Task), NULL);
 
   /* definition and creation of InterruptTask */
-  osThreadDef(InterruptTask, InterruptTask_Func, osPriorityRealtime, 0, 256);
+  osThreadDef(InterruptTask, InterruptTask_Func, osPriorityIdle, 0, 256);
   InterruptTaskHandle = osThreadCreate(osThread(InterruptTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -223,8 +223,8 @@ void GUI_Task_Function(void const * argument)
 /* USER CODE END Header_InterruptTask_Func */
 void InterruptTask_Func(void const * argument)
 {
-	uint32_t EXTI_PIN;
   /* USER CODE BEGIN InterruptTask_Func */
+	uint32_t EXTI_PIN;
   /* Infinite loop */
   for(;;)
   {
