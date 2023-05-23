@@ -229,10 +229,8 @@ void InterruptTask_Func(void const * argument)
   for(;;)
   {
 	  vTaskSuspend(NULL);
-      xTaskNotifyWait(        0x00,               	/* Don't clear any bits on entry. */
-                              0xFFFFFFFF,          	/* Clear all bits on exit. */
-                              &EXTI_PIN, 			/* Receives the notification value. */
-                              portMAX_DELAY );    	/* Block indefinitely. */
+      xTaskNotifyWait(0, 0xFFFFFFFF, &EXTI_PIN, portMAX_DELAY ); /* Don't clear any bits on entry. *//* Clear all bits on exit. *//* Receives the notification value. *//* Block indefinitely. */
+
       switch (EXTI_PIN)
       {
       case ENC_BUT_Pin:
@@ -248,7 +246,8 @@ void InterruptTask_Func(void const * argument)
 		asm("nop");/*debugnop*/
     	  break;
       }
-	  InterruptTaskHandler((uint16_t) (EXTI_PIN & 0xFFFF));
+
+      InterruptTaskHandler((uint16_t) (EXTI_PIN & 0xFFFF));
 	  OsTaskCounterInterruptTask++;
   }
   /* USER CODE END InterruptTask_Func */
