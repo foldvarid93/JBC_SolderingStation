@@ -91,15 +91,7 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_ADC1_Init();
-  MX_CRC_Init();
-  MX_I2C3_Init();
-  MX_TIM2_Init();
-  MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
-  MainInit();
-  //MainTask();
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

@@ -160,6 +160,14 @@ void MX_FREERTOS_Init(void) {
 void InitTask_Func(void const * argument)
 {
   /* USER CODE BEGIN InitTask_Func */
+	  MX_GPIO_Init();
+	  MX_ADC1_Init();
+	  MX_CRC_Init();
+	  MX_I2C3_Init();
+	  MX_TIM2_Init();
+	  MX_USART2_UART_Init();
+
+	  MainInit();
   /* Infinite loop */
   for(;;)
   {

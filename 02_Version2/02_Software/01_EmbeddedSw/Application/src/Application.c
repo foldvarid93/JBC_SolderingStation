@@ -93,7 +93,8 @@ bool CounterFlag = false;
 
 /*Converts a floating point number to string.*/
 /*float to char array conversion*/
-void ftoa(float n, char *res, int afterpoint) {
+void ftoa(float n, char *res, int afterpoint)
+{
 	/*Extract integer part*/
 	int ipart = (int) n;
 	/*Extract floating part*/
@@ -121,7 +122,8 @@ void ftoa(float n, char *res, int afterpoint) {
 	}
 }
 /*send measurements*/
-void SendMeasurements(void) {
+void SendMeasurements(void)
+{
 	char TmpBuffer[20];
 	/*Measuring Points*/
 	itoa(Points, TmpBuffer, 10);
@@ -161,7 +163,8 @@ void SendMeasurements(void) {
 	Points++;
 }
 /*PID Continous*/
-void PID_Continous(void){
+void PID_Continous(void)
+{
 	E1 = E0;
 	E0 = SetPoint - T_tc;
 	Integral = Integral + (E0 * 0.11);
@@ -189,7 +192,7 @@ void InterruptTaskHandler(uint16_t GPIO_Pin)
 /*Zero Crossing Detector External Interrupt*/
 	if (GPIO_Pin == INT_ZC_Pin)
 	{
-		/*if GPIO==0 falling edge after zero crossing*/
+		/*if GPIO==1 rising edge before zero crossing*/
 		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 1)
 			{
 			if (Index == 0) /*under the first half-wave ADC measurement is performed*/
@@ -198,14 +201,15 @@ void InterruptTaskHandler(uint16_t GPIO_Pin)
 				ADCData = TEST_ADCData;
 
 #else			/*ACD+precision OPA*/
-				ADCData = 0;				/*clear the variable*/
 
 				HAL_GPIO_WritePin(INH_ADC_GPIO_Port, INH_ADC_Pin,GPIO_PIN_RESET); /*Release the ADC input*/
+
+				vTaskDelay(5);
 
 				/*Start AD conversion*/
 				HAL_ADC_Start(&hadc1);
 
-				if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) /*ADC read*/
+				if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) /*ADC read*/
 				{
 					ADCData = HAL_ADC_GetValue(&hadc1); /*Add new adc value to the variable*/
 				}
@@ -254,7 +258,7 @@ void InterruptTaskHandler(uint16_t GPIO_Pin)
 				Index = 0;
 			}
 		}
-		/*rising edge before zero crossing*/
+		/*rising edge after zero crossing*/
 		if (HAL_GPIO_ReadPin(INT_ZC_GPIO_Port, INT_ZC_Pin) == 0)
 		{
 			if (Index == 0)
@@ -576,7 +580,8 @@ void StateMachine(void)
 	}
 }
 /**/
-void MainInit(void) {
+void MainInit(void)
+{
 	uint16_t tmp = 0;
 	HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);/*encoder timer2*/
 	/*read stored temperature value from flash*/
