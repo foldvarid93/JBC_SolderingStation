@@ -358,7 +358,7 @@ void InterruptTaskHandler(uint16_t GPIO_Pin)
 	}
 }
 /*system timer 1ms*/
-void HAL_SYSTICK_Callback(void)
+void TimerCallback_1ms(void)
 {
 	Counter++;
 	if (Counter == BlinkingPeriod)

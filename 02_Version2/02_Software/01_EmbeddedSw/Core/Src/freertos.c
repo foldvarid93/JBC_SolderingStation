@@ -28,6 +28,10 @@
 #include "GUI.h"
 #include "Application.h"
 #include "WindowDLG.h"
+#include "../../../lvgl/lvgl.h"
+#include "../../../lvgl/examples/lv_examples.h"
+#include "stdio.h"
+#include "ILI9341.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,6 +41,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define LVGL
+#define BUFF_SIZE 512
 
 /* USER CODE END PD */
 
@@ -56,6 +62,14 @@ osThreadId InitTaskHandle;
 osThreadId MainTaskHandle;
 osThreadId GUI_TaskHandle;
 osThreadId InterruptTaskHandle;
+
+/*LVGL*/
+/*A static or global variable to store the buffers*/
+static lv_disp_draw_buf_t disp_buf;
+
+/*Static or global buffer(s). The second buffer is optional*/
+static lv_color_t buf_1[BUFF_SIZE]; //TODO: Declare your own BUFF_SIZE appropriate to your system.
+static lv_color_t buf_2[BUFF_SIZE];
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -171,9 +185,9 @@ void InitTask_Func(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	HAL_SYSTICK_Callback();
-	OsTaskCounterInitTask++;
-    osDelay(1);
+	  TimerCallback_1ms();
+	  OsTaskCounterInitTask++;
+	  osDelay(1);
   }
   /* USER CODE END InitTask_Func */
 }
@@ -196,6 +210,7 @@ void MainTask_Func(void const * argument)
 #endif
 	OsTaskCounterMainTask++;
     osDelay(1);
+    lv_tick_inc(1);
   }
   /* USER CODE END MainTask_Func */
 }
@@ -209,6 +224,34 @@ void MainTask_Func(void const * argument)
 /* USER CODE END Header_GUI_Task_Function */
 void GUI_Task_Function(void const * argument)
 {
+#ifdef LVGL
+   lv_init();
+   /*display driver init*/
+   LcdInit();
+
+   lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, BUFF_SIZE);
+
+   static lv_disp_drv_t disp_drv;          /*A variable to hold the drivers. Must be static or global.*/
+   lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
+   disp_drv.draw_buf = &disp_buf;          /*Set an initialized buffer*/
+   disp_drv.flush_cb = ili9341_flush;        /*Set a flush callback to draw to the display*/
+   disp_drv.hor_res = ILI9341_TFTWIDTH;                 /*Set the horizontal resolution in pixels*/
+   disp_drv.ver_res = ILI9341_TFTHEIGHT;                 /*Set the vertical resolution in pixels*/
+   disp_drv.rotated = 2;
+
+   lv_disp_t * disp;
+   disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
+
+   lv_example_anim_3();
+
+   for(;;)
+   {
+	   lv_task_handler();
+	   OsTaskCounterGUI_Task++;
+	   osDelay(10);
+
+   }
+#else
   /* USER CODE BEGIN GUI_Task_Function */
 	Init_GUI();		/*initializing graphics*/
   /* Infinite loop */
@@ -219,6 +262,7 @@ void GUI_Task_Function(void const * argument)
 	OsTaskCounterGUI_Task++;
     osDelay(80);
   }
+#endif
   /* USER CODE END GUI_Task_Function */
 }
 

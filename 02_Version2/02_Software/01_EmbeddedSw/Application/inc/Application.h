@@ -40,4 +40,5 @@ extern void StateMachine(void);
 void PID_Discrete(void);
 void PID_Continous(void);
 void InterruptTaskHandler(uint16_t);
+void TimerCallback_1ms(void);
 #endif /* APPLICATION_H_ */
